@@ -65,4 +65,7 @@
         <item>Siglo</item>
         <item>Milenio</item>
     </string-array>
+    <string-array name="spnConversor">
+
+    </string-array>
 </resources>

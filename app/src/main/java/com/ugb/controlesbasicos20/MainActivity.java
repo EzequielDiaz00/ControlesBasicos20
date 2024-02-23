@@ -12,11 +12,21 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 public class MainActivity extends AppCompatActivity {
+
+    TabHost tbh;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tbh = findViewById(R.id.tbhP1);
+        tbh.setup();
+
+        tbh.addTab(tbh.newTabSpec("AGU").setContent(R.id.tab1).setIndicator("AGUA", null));
+        tbh.addTab(tbh.newTabSpec("CON").setContent(R.id.tab2).setIndicator("CONVERSOR", null));
 
     }
 }
