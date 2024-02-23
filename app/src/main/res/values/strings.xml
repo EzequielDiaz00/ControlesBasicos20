@@ -66,6 +66,12 @@
         <item>Milenio</item>
     </string-array>
     <string-array name="spnConversor">
-
+        <item>Pie cuadrado</item>
+        <item>Vara cuadrada</item>
+        <item>Yarda cuadrada</item>
+        <item>Metro cuadrado</item>
+        <item>Tareas</item>
+        <item>Manzanas</item>
+        <item>Hectareas</item>
     </string-array>
 </resources>

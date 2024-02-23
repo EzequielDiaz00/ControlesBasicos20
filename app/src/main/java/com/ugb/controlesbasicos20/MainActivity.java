@@ -6,12 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.RadioGroup;
-import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
-
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,8 +27,10 @@ public class MainActivity extends AppCompatActivity {
         tbh.addTab(tbh.newTabSpec("AGU").setContent(R.id.tab1).setIndicator("AGUA", null));
         tbh.addTab(tbh.newTabSpec("CON").setContent(R.id.tab2).setIndicator("CONVERSOR", null));
 
-        double resp;
         var1 = findViewById(R.id.cant1);
+        btn1 = findViewById(R.id.btn1);
+        result = findViewById(R.id.result);
+
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -40,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     private void Calcular(){
         double metros = Double.parseDouble(var1.getText().toString());
         double tarifa;
@@ -54,6 +53,6 @@ public class MainActivity extends AppCompatActivity {
             tarifa = 6.0 + 0.45 * 10 + 0.65 * (metros - 28);
         }
 
-        result.setText("Resultado" + result);
+        result.setText("Resultado: " + tarifa); // Set the text to the calculated result
     }
 }
