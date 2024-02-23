@@ -17,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     TabHost tbh;
     Button btn1;
+    EditText var1;
+    TextView result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,29 @@ public class MainActivity extends AppCompatActivity {
         tbh.addTab(tbh.newTabSpec("AGU").setContent(R.id.tab1).setIndicator("AGUA", null));
         tbh.addTab(tbh.newTabSpec("CON").setContent(R.id.tab2).setIndicator("CONVERSOR", null));
 
-        btn1.setOnClickListener();
+        double resp;
+        var1 = findViewById(R.id.cant1);
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Calcular();
+            }
+        });
+    }
+    private void Calcular(){
+        double metros = Double.parseDouble(var1.getText().toString());
+        double tarifa;
+
+        if (metros <= 18){
+            tarifa = 6.0;
+        }
+        else if (metros <= 28){
+            tarifa = 6.0 + 0.45 * (metros - 18);
+        }
+        else {
+            tarifa = 6.0 + 0.45 * 10 + 0.65 * (metros - 28);
+        }
+
+        result.setText(String.format("Resultado: ", tarifa));
     }
 }
