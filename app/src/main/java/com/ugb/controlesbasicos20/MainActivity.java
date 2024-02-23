@@ -16,6 +16,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     TabHost tbh;
+    Button btn1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,5 +29,6 @@ public class MainActivity extends AppCompatActivity {
         tbh.addTab(tbh.newTabSpec("AGU").setContent(R.id.tab1).setIndicator("AGUA", null));
         tbh.addTab(tbh.newTabSpec("CON").setContent(R.id.tab2).setIndicator("CONVERSOR", null));
 
+        btn1.setOnClickListener();
     }
 }
