@@ -54,6 +54,6 @@ public class MainActivity extends AppCompatActivity {
             tarifa = 6.0 + 0.45 * 10 + 0.65 * (metros - 28);
         }
 
-        result.setText(String.format("Resultado: ", tarifa));
+        result.setText("Resultado" + result);
     }
 }
