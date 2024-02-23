@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TextView;
 
@@ -13,7 +14,11 @@ public class MainActivity extends AppCompatActivity {
 
     TabHost tbh;
     Button btn1;
+    Button btn2;
+    Spinner spn1;
+    Spinner spn2;
     EditText var1;
+    EditText var2;
     TextView result;
 
     @Override
@@ -28,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
         tbh.addTab(tbh.newTabSpec("CON").setContent(R.id.tab2).setIndicator("CONVERSOR", null));
 
         var1 = findViewById(R.id.cant1);
+        var2 = findViewById(R.id.cant2);
         btn1 = findViewById(R.id.btn1);
         result = findViewById(R.id.result);
 
@@ -35,6 +41,24 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Calcular();
+            }
+        });
+
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spn1 = findViewById(R.id.spn1);
+                int de = spn1.getSelectedItemPosition();
+
+                spn1 = findViewById(R.id.spn2);
+                int a = spn1.getSelectedItemPosition();
+
+                var2 = findViewById(R.id.cant2);
+
+
+                double resp = miObj.convertir5(0, de, a, cantidad);
+                Toast.makeText(getApplicationContext(), "Respuesta: " + resp, Toast.LENGTH_LONG).show();
+                textViewResultado.setText("El resultado es: " + resp);
             }
         });
     }
@@ -56,3 +80,9 @@ public class MainActivity extends AppCompatActivity {
         result.setText("Resultado: " + tarifa); // Set the text to the calculated result
     }
 }
+
+
+class conversores{
+    double[][] valores1={
+            {1, 100, 39.3701, 3.28084, 1.193, 1.09361, 0.001, 0.000621371}
+    };
