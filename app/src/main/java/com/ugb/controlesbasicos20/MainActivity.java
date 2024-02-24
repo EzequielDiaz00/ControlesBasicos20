@@ -1,3 +1,5 @@
+package com.ugb.controlesbasicos20;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -20,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     EditText var1;
     EditText var2;
     TextView result;
+    TextView result1;
     conversores miObj; // Instantiate conversores
 
     @Override
@@ -38,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         btn1 = findViewById(R.id.btn1);
         btn2 = findViewById(R.id.btn2); // Initialize btn2
         result = findViewById(R.id.result);
+        result1 = findViewById(R.id.result1);
 
         miObj = new conversores(); // Initialize miObj
 
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
                 double resp = miObj.convertir(0, de, a, cantidad);
                 Toast.makeText(getApplicationContext(), "Respuesta: " + resp, Toast.LENGTH_LONG).show();
-                result.setText("El resultado es: " + resp);
+                result1.setText("El resultado es: " + resp);
             }
         });
 
