@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Conversores</string>
+    <string name="app_name">AmigosSQLite</string>
     <string-array name="spnLon">
         <item>Metros</item>
         <item>Cm</item>
