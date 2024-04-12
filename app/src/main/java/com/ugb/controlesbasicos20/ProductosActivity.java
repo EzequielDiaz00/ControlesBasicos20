@@ -21,6 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 public class ProductosActivity extends AppCompatActivity {
@@ -33,22 +36,85 @@ public class ProductosActivity extends AppCompatActivity {
     DB db;
     final ArrayList<Producto> alProd = new ArrayList<Producto>();
     final ArrayList<Producto> alProdCopy = new ArrayList<Producto>();
+    JSONArray datosJSON;
+    JSONObject jsonObject;
+    obtenerDatosServidor datosServidor;
+    detectarInternet di;
+    int posicion = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_productos);
 
+        db = new DB(ProductosActivity.this, "", null, 1);
         btnAgregarProd = findViewById(R.id.fabAgregarProd);
         btnAgregarProd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                parametros.putString("accion","nuevo");
+                parametros.putString("accion", "nuevo");
                 abrirActividad(parametros);
             }
         });
-        obtenerDatosProd();
+        try {
+            di = new detectarInternet(getApplicationContext());
+            if (di.hayConexionInternet()) {
+                obtenerDatosProdServidor();
+            } else {//offline
+                obtenerDatosProd();
+            }
+        } catch (Exception e) {
+            mostrarMsg("Error al cargar lista amigo: " + e.getMessage());
+        }
         buscarProd();
+
+    }
+
+    private void obtenerDatosProdServidor() {
+        try {
+            datosServidor = new obtenerDatosServidor();
+            String data = datosServidor.execute().get();
+            jsonObject = new JSONObject(data);
+            datosJSON = jsonObject.getJSONArray("rows");
+            mostrarDatosProd();
+        } catch (Exception e) {
+            mostrarMsg("Error al obtener datos del server: " + e.getMessage());
+        }
+    }
+
+    private void mostrarDatosProd() {
+        try {
+            if (datosJSON.length() > 0) {
+                lts = findViewById(R.id.ltsProd);
+                alProd.clear();
+                alProdCopy.clear();
+
+                JSONObject misDatosJSONObject;
+                for (int i = 0; i < datosJSON.length(); i++) {
+                    misDatosJSONObject = datosJSON.getJSONObject(i).getJSONObject("value");
+                    productosAdapter = new Producto(
+                            misDatosJSONObject.getString("_id"),
+                            misDatosJSONObject.getString("_rev"),
+                            misDatosJSONObject.getString("idProd"),
+                            misDatosJSONObject.getString("codigo"),
+                            misDatosJSONObject.getString("descripcion"),
+                            misDatosJSONObject.getString("marca"),
+                            misDatosJSONObject.getString("presentacion"),
+                            misDatosJSONObject.getString("precio"),
+                            misDatosJSONObject.getString("urlCompletaFoto")
+                    );
+                    alProd.add(productosAdapter);
+                }
+                alProdCopy.addAll(alProd);
+                AdaptadorImagenes adImagenes = new AdaptadorImagenes(ProductosActivity.this, alProd);
+                lts.setAdapter(adImagenes);
+                registerForContextMenu(lts);
+            } else {
+                mostrarMsg("No hay datos que mostrar.");
+            }
+        } catch (Exception e) {
+            mostrarMsg("Error al mostrar los datos: " + e.getMessage());
+        }
     }
 
     @Override
@@ -66,33 +132,22 @@ public class ProductosActivity extends AppCompatActivity {
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         try {
             int itemId = item.getItemId();
+
             if (itemId == R.id.mnxAgregar) {
                 parametros.putString("accion", "nuevo");
                 abrirActividad(parametros);
-                return true;
             } else if (itemId == R.id.mnxModificar) {
-                String[] productos = {
-                        cProd.getString(0), //idProd
-                        cProd.getString(1), //codigo
-                        cProd.getString(2), //descripcion
-                        cProd.getString(3), //marca
-                        cProd.getString(4), //presentacion
-                        cProd.getString(5), //precio
-                        cProd.getString(6), //foto
-                };
                 parametros.putString("accion", "modificar");
-                parametros.putStringArray("productos", productos);
+                parametros.putString("amigos", datosJSON.getJSONObject(posicion).toString());
                 abrirActividad(parametros);
-                return true;
             } else if (itemId == R.id.mnxEliminar) {
                 eliminarProd();
-                return true;
             }
-            return super.onContextItemSelected(item);
         } catch (Exception e) {
-            mostrarMsg("Error al seleccionar una opción del menú: " + e.getMessage());
+            mostrarMsg("Error al seleccionar una opcion del mennu: " + e.getMessage());
             return super.onContextItemSelected(item);
         }
+        return true;
     }
 
     private void eliminarProd(){
@@ -103,12 +158,16 @@ public class ProductosActivity extends AppCompatActivity {
             confirmar.setPositiveButton("SI", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    String respuesta = db.administrar_prod("eliminar", new String[]{cProd.getString(0)});//0 es el idAmigo
-                    if(respuesta.equals("ok")){
-                        mostrarMsg("Producto eliminado con éxito");
-                        obtenerDatosProd();
-                    } else {
-                        mostrarMsg("Error al eliminar el producto: "+ respuesta);
+                    try {
+                        String respuesta = db.administrar_prod("eliminar", new String[]{cProd.getString(0)});//0 es el idAmigo
+                        if(respuesta.equals("ok")){
+                            mostrarMsg("Producto eliminado con éxito");
+                            obtenerDatosProd();
+                        } else {
+                            mostrarMsg("Error al eliminar el producto: "+ respuesta);
+                        }
+                    }catch (Exception e){
+                        mostrarMsg("Error al intentar eliminar: "+ e.getMessage());
                     }
                 }
             });
@@ -130,37 +189,34 @@ public class ProductosActivity extends AppCompatActivity {
         startActivity(abrirActividad);
     }
 
-    private void obtenerDatosProd(){
+    private void obtenerDatosProd(){//offline
         try {
-            alProd.clear();
-            alProdCopy.clear();
-
-            db = new DB(ProductosActivity.this, "", null, 1);
             cProd = db.consultar_prod();
 
             if( cProd.moveToFirst() ){
-                lts = findViewById(R.id.ltsProd);
+                datosJSON = new JSONArray();
                 do{
-                    Producto producto = new Producto(
-                            cProd.getString(0),//idProd
-                            cProd.getString(1),//codigo
-                            cProd.getString(2),//descripcion
-                            cProd.getString(3),//marca
-                            cProd.getString(4),//presentacion
-                            cProd.getString(5),//precio
-                            cProd.getString(6) //foto
-                    );
-                    alProd.add(producto);
-                } while(cProd.moveToNext());
-                alProdCopy.addAll(alProd);
+                    jsonObject =new JSONObject();
+                    JSONObject jsonObjectValue = new JSONObject();
+                    jsonObject.put("_id", cProd.getString(0));
+                    jsonObject.put("_rev", cProd.getString(1));
+                    jsonObject.put("idProd", cProd.getString(2));
+                    jsonObject.put("codigo", cProd.getString(3));
+                    jsonObject.put("descripcion", cProd.getString(4));
+                    jsonObject.put("marca", cProd.getString(5));
+                    jsonObject.put("presentacion", cProd.getString(6));
+                    jsonObject.put("precio", cProd.getString(7));
+                    jsonObject.put("urlCompletaFoto", cProd.getString(8));
 
-                lts.setAdapter(new AdaptadorImagenes(ProductosActivity.this, alProd));
+                    jsonObjectValue.put("value", jsonObject);
+                    datosJSON.put(jsonObjectValue);
 
-                registerForContextMenu(lts);
-            } else {
+                }while(cProd.moveToNext());
+                mostrarDatosProd();
+            }else{
                 mostrarMsg("No hay Datos de amigos que mostrar.");
             }
-        } catch (Exception e){
+        }catch (Exception e){
             mostrarMsg("Error al mostrar datos: "+ e.getMessage());
         }
     }
@@ -173,44 +229,41 @@ public class ProductosActivity extends AppCompatActivity {
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
-
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
                     alProd.clear();
                     String valor = tempVal.getText().toString().trim().toLowerCase();
-                    if (valor.length() <= 0) {
+                    if( valor.length()<=0 ){
                         alProd.addAll(alProdCopy);
-                    } else {
-                        for (Producto producto : alProdCopy) {
+                    }else{
+                        for (Producto producto : alProdCopy){
                             String codigo = producto.getCodigo();
                             String descripcion = producto.getDescripcion();
                             String marca = producto.getMarca();
                             String presentacion = producto.getPresentacion();
                             String precio = producto.getPrecio();
-                            if (codigo.toLowerCase().trim().contains(valor) ||
+                            if(codigo.toLowerCase().trim().contains(valor) ||
                                     descripcion.toLowerCase().trim().contains(valor) ||
                                     marca.trim().contains(valor) ||
                                     presentacion.trim().toLowerCase().contains(valor) ||
-                                    precio.trim().contains(valor)) {
+                                    precio.trim().contains(valor)){
                                 alProd.add(producto);
                             }
                         }
+                        AdaptadorImagenes adImagenes = new AdaptadorImagenes(getApplicationContext(), alProd);
+                        lts.setAdapter(adImagenes);
                     }
-                    // Notificar al adaptador de los cambios en los datos
-                    ((AdaptadorImagenes) lts.getAdapter()).notifyDataSetChanged();
-                } catch (Exception e){
+                }catch (Exception e){
                     mostrarMsg("Error al buscar: "+ e.getMessage());
                 }
             }
-
             @Override
             public void afterTextChanged(Editable editable) {
 
             }
         });
     }
-
 
     private void mostrarMsg(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();

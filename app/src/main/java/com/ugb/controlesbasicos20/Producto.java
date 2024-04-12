@@ -1,6 +1,8 @@
 package com.ugb.controlesbasicos20;
 
 public class Producto {
+    String _id;
+    String _rev;
     private String idProducto;
     private String codigo;
     private String descripcion;
@@ -8,8 +10,9 @@ public class Producto {
     private String presentacion;
     private String precio;
     private String foto;
-
-    public Producto(String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto) {
+    public Producto(String _id, String _rev,String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto) {
+        this._id = _id;
+        this._rev = _rev;
         this.idProducto = idProducto;
         this.codigo = codigo;
         this.descripcion = descripcion;
@@ -17,6 +20,18 @@ public class Producto {
         this.presentacion = presentacion;
         this.precio = precio;
         this.foto = foto;
+    }
+    public String get_id() {
+        return _id;
+    }
+    public void set_id(String _id) {
+        this._id = _id;
+    }
+    public String get_rev() {
+        return _rev;
+    }
+    public void set_rev(String _rev) {
+        this._rev = _rev;
     }
 
     public String getFoto() {
