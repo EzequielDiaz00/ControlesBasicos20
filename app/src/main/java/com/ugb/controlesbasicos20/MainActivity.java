@@ -109,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
                         mostrarMsg("Error al intentar registrar el producto: " + respuesta);
                     }
                 }catch (Exception e){
-                    e.printStackTrace();
                     mostrarMsg("Error al guadar datos en el servidor o en SQLite: "+ e.getMessage());
                 }
             }
@@ -143,17 +142,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        try {
-            if (requestCode == 1 && resultCode == RESULT_OK) {
+        try{
+            if( requestCode==1 && resultCode==RESULT_OK ){
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
-                Producto producto = new Producto();
-                producto.setFoto(urlCompletaFoto);
                 img.setImageBitmap(imagenBitmap);
-            } else {
-                mostrarMsg("Se canceló la toma de la foto");
+            }else{
+                mostrarMsg("Se cancelo la toma de la foto");
             }
-        } catch (Exception e) {
-            mostrarMsg("Error al seleccionar la foto: " + e.getMessage());
+        }catch (Exception e){
+            mostrarMsg("Error al seleccionar la foto"+ e.getMessage());
         }
     }
     private File crearImagenamigo() throws Exception{

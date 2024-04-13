@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,12 +74,10 @@ public class ProductosActivity extends AppCompatActivity {
         try {
             datosServidor = new obtenerDatosServidor();
             String data = datosServidor.execute().get();
-            JSONObject jsonObject = new JSONObject(data);
+            jsonObject = new JSONObject(data);
             datosJSON = jsonObject.getJSONArray("rows");
             mostrarDatosProd();
-            Log.d("Respuesta del servidor", data);
         } catch (Exception e) {
-            e.printStackTrace();
             mostrarMsg("Error al obtener datos del server: " + e.getMessage());
         }
     }
@@ -96,6 +93,15 @@ public class ProductosActivity extends AppCompatActivity {
                 for (int i = 0; i < datosJSON.length(); i++) {
                     misDatosJSONObject = datosJSON.getJSONObject(i).getJSONObject("value");
                     productosAdapter = new Producto(
+                            misDatosJSONObject.getString("_id"),
+                            misDatosJSONObject.getString("_rev"),
+                            misDatosJSONObject.getString("idProd"),
+                            misDatosJSONObject.getString("codigo"),
+                            misDatosJSONObject.getString("descripcion"),
+                            misDatosJSONObject.getString("marca"),
+                            misDatosJSONObject.getString("presentacion"),
+                            misDatosJSONObject.getString("precio"),
+                            misDatosJSONObject.getString("urlCompletaFoto")
                     );
                     alProd.add(productosAdapter);
                 }
