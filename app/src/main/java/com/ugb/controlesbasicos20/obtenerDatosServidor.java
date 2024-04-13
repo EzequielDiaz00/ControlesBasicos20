@@ -25,7 +25,7 @@ public class obtenerDatosServidor extends AsyncTask<String, String, String> {
             httpURLConnection.setRequestProperty("Authorization", "Basic "+ utilidades.credencialesCodificadas);
 
             InputStream inputStream = new BufferedInputStream(httpURLConnection.getInputStream());
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
             String linea;
             while( (linea = reader.readLine())!=null ){

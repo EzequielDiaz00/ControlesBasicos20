@@ -37,8 +37,6 @@ public class AdaptadorImagenes extends BaseAdapter {
     public long getItemId(int i) {
         return Long.parseLong(datosProductosArrayList.get(i).getIdProducto());
     }
-
-    @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View itemView = layoutInflater.inflate(R.layout.listview_imagenes, viewGroup, false);
@@ -56,6 +54,7 @@ public class AdaptadorImagenes extends BaseAdapter {
             tempVal.setText(producto.getPrecio());
 
             ImageView imgView = itemView.findViewById(R.id.imgFoto);
+            // Utilizamos la ruta de la imagen del producto para crear el Bitmap
             Bitmap imagenBitmap = BitmapFactory.decodeFile(producto.getFoto());
             imgView.setImageBitmap(imagenBitmap);
         } catch (Exception e) {

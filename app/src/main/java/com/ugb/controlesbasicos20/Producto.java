@@ -10,7 +10,7 @@ public class Producto {
     private String presentacion;
     private String precio;
     private String foto;
-    public Producto(String _id, String _rev,String idProducto, String codigo, String descripcion, String marca, String presentacion, String precio, String foto) {
+    public Producto() {
         this._id = _id;
         this._rev = _rev;
         this.idProducto = idProducto;
