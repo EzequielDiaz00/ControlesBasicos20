@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -164,42 +165,54 @@ public class MainActivity extends AppCompatActivity {
         urlCompletaFoto = image.getAbsolutePath();
         return image;
     }
-    private void mostrarDatosProd(){
-        try{
+    private void mostrarDatosProd() {
+        try {
             Bundle parametros = getIntent().getExtras();
-            accion = parametros.getString("accion");
+            if (parametros != null) {
+                accion = parametros.getString("accion");
 
-            if(accion.equals("modificar")){
-                JSONObject jsonObject = new JSONObject(parametros.getString("amigos")).getJSONObject("value");
-                id = jsonObject.getString("_id");
-                rev = jsonObject.getString("_rev");
-                idProd = jsonObject.getString("idProd");
+                if ("modificar".equals(accion)) {
+                    String productosString = parametros.getString("productos");
+                    if (productosString != null) {
+                        JSONObject jsonObject = new JSONObject(productosString).getJSONObject("value");
+                        id = jsonObject.getString("_id");
+                        rev = jsonObject.getString("_rev");
+                        idProd = jsonObject.getString("idProd");
 
-                tempVal = findViewById(R.id.txtCod);
-                tempVal.setText(jsonObject.getString("codigo"));
+                        tempVal = findViewById(R.id.txtCod);
+                        tempVal.setText(jsonObject.getString("codigo"));
 
-                tempVal = findViewById(R.id.txtDes);
-                tempVal.setText(jsonObject.getString("descripcion"));
+                        tempVal = findViewById(R.id.txtDes);
+                        tempVal.setText(jsonObject.getString("descripcion"));
 
-                tempVal = findViewById(R.id.txtMar);
-                tempVal.setText(jsonObject.getString("marca"));
+                        tempVal = findViewById(R.id.txtMar);
+                        tempVal.setText(jsonObject.getString("marca"));
 
-                tempVal = findViewById(R.id.txtPres);
-                tempVal.setText(jsonObject.getString("presentacion"));
+                        tempVal = findViewById(R.id.txtPres);
+                        tempVal.setText(jsonObject.getString("presentacion"));
 
-                tempVal = findViewById(R.id.txtPrec);
-                tempVal.setText(jsonObject.getString("precio"));
+                        tempVal = findViewById(R.id.txtPrec);
+                        tempVal.setText(jsonObject.getString("precio"));
 
-                urlCompletaFoto = jsonObject.getString("urlCompletaFoto");
-                Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
-                img.setImageBitmap(imagenBitmap);
-            }else{//nuevos registros
-                idProd = utls.generarIdUnico();
+                        urlCompletaFoto = jsonObject.getString("urlCompletaFoto");
+                        Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
+                        img.setImageBitmap(imagenBitmap);
+                    } else {
+                        mostrarMsg("El valor asociado con la clave 'productos' es nulo.");
+                    }
+                } else { // Nuevos registros
+                    idProd = utls.generarIdUnico();
+                }
+            } else {
+                mostrarMsg("No se encontraron parámetros.");
             }
-        }catch (Exception e){
-            mostrarMsg("Error al mostrar los datos: ");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            mostrarMsg("Error al mostrar los datos: " + e.getMessage());
         }
     }
+
+
     private void mostrarMsg(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }

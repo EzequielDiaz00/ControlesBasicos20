@@ -19,24 +19,35 @@
         android:layout_marginTop="10dp"
         android:layout_marginLeft="80dp"
         android:text="Codigo"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="18dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
+    <TextView
+        android:id="@+id/lblMar"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="80dp"
+        android:text="Marca"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"/>
+
     <TextView
         android:id="@+id/lblDes"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="80dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="170dp"
         android:text="Descripcion"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
+
     <TextView
         android:id="@+id/lblPrec"
-        android:layout_marginTop="30dp"
-        android:layout_marginLeft="200dp"
-        android:text="Precio"
-        android:textColor="@color/black"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="270dp"
+        android:layout_marginTop="50dp"
+        android:text="Precio"
+        android:textColor="@color/white" />
 </RelativeLayout>

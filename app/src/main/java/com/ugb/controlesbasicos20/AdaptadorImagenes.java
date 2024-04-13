@@ -35,33 +35,40 @@ public class AdaptadorImagenes extends BaseAdapter {
 
     @Override
     public long getItemId(int i) {
-        return Long.parseLong(datosProductosArrayList.get(i).getIdProducto());
+        return i;
     }
 
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
-        layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View itemView = layoutInflater.inflate(R.layout.listview_imagenes, viewGroup, false);
+        if (layoutInflater == null) {
+            layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        }
+        if (view == null) {
+            view = layoutInflater.inflate(R.layout.listview_imagenes, viewGroup, false);
+        }
 
         try {
             Producto producto = datosProductosArrayList.get(i);
 
-            TextView tempVal = itemView.findViewById(R.id.lblCod);
+            TextView tempVal = view.findViewById(R.id.lblCod);
             tempVal.setText(producto.getCodigo());
 
-            tempVal = itemView.findViewById(R.id.lblDes);
+            tempVal = view.findViewById(R.id.lblDes);
             tempVal.setText(producto.getDescripcion());
 
-            tempVal = itemView.findViewById(R.id.lblPrec);
-            tempVal.setText(producto.getPrecio());
+            tempVal = view.findViewById(R.id.lblMar);
+            tempVal.setText(producto.getMarca());
 
-            ImageView imgView = itemView.findViewById(R.id.imgFoto);
+            tempVal = view.findViewById(R.id.lblPrec);
+            tempVal.setText("$"+producto.getPrecio());
+
+            ImageView imgView = view.findViewById(R.id.imgFoto);
             Bitmap imagenBitmap = BitmapFactory.decodeFile(producto.getFoto());
             imgView.setImageBitmap(imagenBitmap);
         } catch (Exception e) {
             Toast.makeText(context, "Error en Adaptador Imagenes: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
-        return itemView;
+        return view;
     }
 }
