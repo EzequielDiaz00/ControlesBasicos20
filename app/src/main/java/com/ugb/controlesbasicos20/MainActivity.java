@@ -36,61 +36,58 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnRegresar = findViewById(R.id.fabListaAuto);
+        btnRegresar = findViewById(R.id.fabListaPeli);
         btnRegresar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent regresarLista = new Intent(getApplicationContext(), AutosActivity.class);
+                Intent regresarLista = new Intent(getApplicationContext(), PeliculasActivity.class);
                 startActivity(regresarLista);
             }
         });
-        btn = findViewById(R.id.btnGuardarAuto);
+        btn = findViewById(R.id.btnGuardarPeli);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tempVal = findViewById(R.id.txtMar);
-                String marca = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtTit);
+                String titulo = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtMot);
-                String motor = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtSin);
+                String sinopsis = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtCha);
-                String chasis = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtDur);
+                String duracion = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtVin);
-                String vin = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtAct);
+                String actor = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtCom);
-                String combustion = tempVal.getText().toString();
-
-                String[] datos = new String[]{id,marca,motor,chasis,vin,combustion,urlCompletaFoto};
+                String[] datos = new String[]{id,titulo,sinopsis,duracion,actor,urlCompletaFoto};
                 DB db = new DB(getApplicationContext(),"", null, 1);
-                String respuesta = db.administrar_auto(accion, datos);
+                String respuesta = db.administrar_peli(accion, datos);
                 if( respuesta.equals("ok") ){
-                    mostrarMsg("Auto registrado con exito.");
-                    listarAuto();
+                    mostrarMsg("Pelicula registrado con exito.");
+                    listarPeli();
                 }else {
-                    mostrarMsg("Error al intentar registrar el Auto: "+ respuesta);
+                    mostrarMsg("Error al intentar registrar la pelicula: "+ respuesta);
                 }
             }
         });
-        img = findViewById(R.id.btnImgAuto);
+        img = findViewById(R.id.btnImgPeli);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tomarFotoAuto();
+                tomarFotoPeli();
             }
         });
-        mostrarDatosAuto();
+        mostrarDatosPeli();
     }
-    private void tomarFotoAuto(){
+    private void tomarFotoPeli(){
         tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File fotoAuto = null;
+        File fotoPeli = null;
         try{
-            fotoAuto = crearImagenamigo();
-            if( fotoAuto!=null ){
+            fotoPeli = crearImagenamigo();
+            if( fotoPeli!=null ){
                 Uri urifotoAmigo = FileProvider.getUriForFile(MainActivity.this,
-                        "com.ugb.controlesbasicos.fileprovider", fotoAuto);
+                        "com.ugb.controlesbasicos.fileprovider", fotoPeli);
                 tomarFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, urifotoAmigo);
                 startActivityForResult(tomarFotoIntent, 1);
             }else{
@@ -125,31 +122,28 @@ public class MainActivity extends AppCompatActivity {
         urlCompletaFoto = image.getAbsolutePath();
         return image;
     }
-    private void mostrarDatosAuto(){
+    private void mostrarDatosPeli(){
         try{
             Bundle parametros = getIntent().getExtras();
             accion = parametros.getString("accion");
 
             if(accion.equals("modificar")){
-                String[] autos = parametros.getStringArray("autos");
-                id = autos[0];
+                String[] peli = parametros.getStringArray("peli");
+                id = peli[0];
 
-                tempVal = findViewById(R.id.txtMar);
-                tempVal.setText(autos[1]);
+                tempVal = findViewById(R.id.txtTit);
+                tempVal.setText(peli[1]);
 
-                tempVal = findViewById(R.id.txtMot);
-                tempVal.setText(autos[2]);
+                tempVal = findViewById(R.id.txtSin);
+                tempVal.setText(peli[2]);
 
-                tempVal = findViewById(R.id.txtCha);
-                tempVal.setText(autos[3]);
+                tempVal = findViewById(R.id.txtDur);
+                tempVal.setText(peli[3]);
 
-                tempVal = findViewById(R.id.txtVin);
-                tempVal.setText(autos[4]);
+                tempVal = findViewById(R.id.txtAct);
+                tempVal.setText(peli[4]);
 
-                tempVal = findViewById(R.id.txtCom);
-                tempVal.setText(autos[5]);
-
-                urlCompletaFoto = autos[6];
+                urlCompletaFoto = peli[5];
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                 img.setImageBitmap(imagenBitmap);
             }
@@ -160,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
     private void mostrarMsg(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
-    private void listarAuto(){
-        Intent intent = new Intent(getApplicationContext(), AutosActivity.class);
+    private void listarPeli(){
+        Intent intent = new Intent(getApplicationContext(), PeliculasActivity.class);
         startActivity(intent);
     }
 }

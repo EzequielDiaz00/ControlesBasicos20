@@ -23,23 +23,23 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class AutosActivity extends AppCompatActivity {
+public class PeliculasActivity extends AppCompatActivity {
 
     Bundle parametros = new Bundle();
     FloatingActionButton btnAgregarAuto;
     ListView lts;
-    Cursor cAuto;
-    Auto autosAdapter;
+    Cursor cPeli;
+    Pelicula peliAdapter;
     DB db;
-    final ArrayList<Auto> alAuto = new ArrayList<Auto>();
-    final ArrayList<Auto> alAutoCopy = new ArrayList<Auto>();
+    final ArrayList<Pelicula> alPeli = new ArrayList<Pelicula>();
+    final ArrayList<Pelicula> alPeliCopy = new ArrayList<Pelicula>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_autos);
+        setContentView(R.layout.activity_peliculas);
 
-        btnAgregarAuto = findViewById(R.id.fabAgregarAuto);
+        btnAgregarAuto = findViewById(R.id.fabAgregarPeli);
         btnAgregarAuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,8 +47,8 @@ public class AutosActivity extends AppCompatActivity {
                 abrirActividad(parametros);
             }
         });
-        obtenerDatosAuto();
-        buscarAuto();
+        obtenerDatosPeli();
+        buscarPeli();
     }
 
     @Override
@@ -58,8 +58,8 @@ public class AutosActivity extends AppCompatActivity {
         inflater.inflate(R.menu.mimenu, menu);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        cAuto.moveToPosition(info.position);
-        menu.setHeaderTitle(cAuto.getString(1)); //1 es el nombre
+        cPeli.moveToPosition(info.position);
+        menu.setHeaderTitle(cPeli.getString(1)); //1 es el nombre
     }
 
     @Override
@@ -71,21 +71,20 @@ public class AutosActivity extends AppCompatActivity {
                 abrirActividad(parametros);
                 return true;
             } else if (itemId == R.id.mnxModificar) {
-                String[] autos = {
-                        cAuto.getString(0),
-                        cAuto.getString(1),
-                        cAuto.getString(2),
-                        cAuto.getString(3),
-                        cAuto.getString(4),
-                        cAuto.getString(5),
-                        cAuto.getString(6),
+                String[] peli = {
+                        cPeli.getString(0),
+                        cPeli.getString(1),
+                        cPeli.getString(2),
+                        cPeli.getString(3),
+                        cPeli.getString(4),
+                        cPeli.getString(5),
                 };
                 parametros.putString("accion", "modificar");
-                parametros.putStringArray("autos", autos);
+                parametros.putStringArray("peli", peli);
                 abrirActividad(parametros);
                 return true;
             } else if (itemId == R.id.mnxEliminar) {
-                eliminarAuto();
+                eliminarPeli();
                 return true;
             }
             return super.onContextItemSelected(item);
@@ -95,20 +94,20 @@ public class AutosActivity extends AppCompatActivity {
         }
     }
 
-    private void eliminarAuto(){
+    private void eliminarPeli(){
         try{
-            AlertDialog.Builder confirmar = new AlertDialog.Builder(AutosActivity.this);
+            AlertDialog.Builder confirmar = new AlertDialog.Builder(PeliculasActivity.this);
             confirmar.setTitle("Estás seguro de eliminar: ");
-            confirmar.setMessage(cAuto.getString(1)); //1 es el nombre
+            confirmar.setMessage(cPeli.getString(1)); //1 es el nombre
             confirmar.setPositiveButton("SI", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    String respuesta = db.administrar_auto("eliminar", new String[]{cAuto.getString(0)});//0 es el idAmigo
+                    String respuesta = db.administrar_peli("eliminar", new String[]{cPeli.getString(0)});//0 es el idAmigo
                     if(respuesta.equals("ok")){
-                        mostrarMsg("Auto eliminado con éxito");
-                        obtenerDatosAuto();
+                        mostrarMsg("Pelicula eliminado con éxito");
+                        obtenerDatosPeli();
                     } else {
-                        mostrarMsg("Error al eliminar el auto: "+ respuesta);
+                        mostrarMsg("Error al eliminar la pelicula: "+ respuesta);
                     }
                 }
             });
@@ -120,7 +119,7 @@ public class AutosActivity extends AppCompatActivity {
             });
             confirmar.create().show();
         } catch (Exception e){
-            mostrarMsg("Error al eliminar auto: "+ e.getMessage());
+            mostrarMsg("Error al eliminar pelicula: "+ e.getMessage());
         }
     }
 
@@ -130,31 +129,30 @@ public class AutosActivity extends AppCompatActivity {
         startActivity(abrirActividad);
     }
 
-    private void obtenerDatosAuto(){
+    private void obtenerDatosPeli(){
         try {
-            alAuto.clear();
-            alAutoCopy.clear();
+            alPeli.clear();
+            alPeliCopy.clear();
 
-            db = new DB(AutosActivity.this, "", null, 1);
-            cAuto = db.consultar_auto();
+            db = new DB(PeliculasActivity.this, "", null, 1);
+            cPeli = db.consultar_peli();
 
-            if( cAuto.moveToFirst() ){
-                lts = findViewById(R.id.ltsAuto);
+            if( cPeli.moveToFirst() ){
+                lts = findViewById(R.id.ltsPeli);
                 do{
-                    Auto auto = new Auto(
-                            cAuto.getString(0),
-                            cAuto.getString(1),
-                            cAuto.getString(2),
-                            cAuto.getString(3),
-                            cAuto.getString(4),
-                            cAuto.getString(5),
-                            cAuto.getString(6)
+                    Pelicula peli = new Pelicula(
+                            cPeli.getString(0),
+                            cPeli.getString(1),
+                            cPeli.getString(2),
+                            cPeli.getString(3),
+                            cPeli.getString(4),
+                            cPeli.getString(5)
                     );
-                    alAuto.add(auto);
-                } while(cAuto.moveToNext());
-                alAutoCopy.addAll(alAuto);
+                    alPeli.add(peli);
+                } while(cPeli.moveToNext());
+                alPeli.addAll(alPeli);
 
-                lts.setAdapter(new AdaptadorImagenes(AutosActivity.this, alAuto));
+                lts.setAdapter(new AdaptadorImagenes(PeliculasActivity.this, alPeli));
 
                 registerForContextMenu(lts);
             } else {
@@ -165,9 +163,9 @@ public class AutosActivity extends AppCompatActivity {
         }
     }
 
-    private void buscarAuto(){
+    private void buscarPeli(){
         TextView tempVal;
-        tempVal = findViewById(R.id.txtBuscarAuto);
+        tempVal = findViewById(R.id.txtBuscarPeli);
         tempVal.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -177,23 +175,21 @@ public class AutosActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
-                    alAuto.clear();
+                    alPeli.clear();
                     String valor = tempVal.getText().toString().trim().toLowerCase();
                     if (valor.length() <= 0) {
-                        alAuto.addAll(alAutoCopy);
+                        alPeli.addAll(alPeliCopy);
                     } else {
-                        for (Auto auto : alAutoCopy) {
-                            String marca = auto.getMarca();
-                            String motor = auto.getMotor();
-                            String chasis = auto.getChasis();
-                            String vin = auto.getVin();
-                            String combustion = auto.getCombustion();
-                            if (    marca.toLowerCase().trim().contains(valor) ||
-                                    motor.toLowerCase().trim().contains(valor) ||
-                                    chasis.trim().contains(valor) ||
-                                    vin.trim().toLowerCase().contains(valor) ||
-                                    combustion.trim().contains(valor)) {
-                                alAuto.add(auto);
+                        for (Pelicula peli : alPeliCopy) {
+                            String titulo = peli.getTitulo();
+                            String sinopsis = peli.getSinopsis();
+                            String duracion = peli.getDuracion();
+                            String actor = peli.getActor();
+                            if (    titulo.toLowerCase().trim().contains(valor) ||
+                                    sinopsis.toLowerCase().trim().contains(valor) ||
+                                    duracion.trim().contains(valor) ||
+                                    actor.trim().toLowerCase().contains(valor)){
+                                alPeli.add(peli);
                             }
                         }
                     }

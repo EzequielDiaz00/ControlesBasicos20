@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <ImageButton
-        android:id="@+id/btnImgAuto"
+        android:id="@+id/btnImgPeli"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentStart="true"
@@ -18,55 +18,47 @@
         android:src="@android:drawable/ic_menu_camera" />
 
     <EditText
-        android:id="@+id/txtMar"
-        android:hint="Marca"
-        android:layout_below="@id/btnImgAuto"
+        android:id="@+id/txtTit"
+        android:hint="Titulo"
+        android:layout_below="@id/btnImgPeli"
         android:inputType="number"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/txtMot"
-        android:hint="Motor"
+        android:id="@+id/txtSin"
+        android:hint="Sinopsis"
         android:inputType="textMultiLine"
-        android:layout_below="@id/txtMar"
+        android:layout_below="@id/txtTit"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/txtCha"
-        android:hint="Chasis"
+        android:id="@+id/txtDur"
+        android:hint="Duracion"
         android:inputType="textMultiLine"
-        android:layout_below="@id/txtMot"
+        android:layout_below="@id/txtSin"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/txtVin"
-        android:hint="Vin"
+        android:id="@+id/txtAct"
+        android:hint="Actor"
         android:inputType="textMultiLine"
-        android:layout_below="@id/txtCha"
-        android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/txtCom"
-        android:hint="Combustion"
-        android:inputType="numberDecimal"
-        android:layout_below="@id/txtVin"
+        android:layout_below="@id/txtDur"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/btnGuardarAuto"
-        android:text="GUARDAR PRODUCTO"
+        android:id="@+id/btnGuardarPeli"
+        android:text="GUARDAR PELICULA"
         android:layout_width="match_parent"
-        android:layout_below="@id/txtCom"
+        android:layout_below="@id/txtAct"
         android:layout_marginTop="40dp"
         android:layout_height="wrap_content"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabListaAuto"
+        android:id="@+id/fabListaPeli"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="20dp"
