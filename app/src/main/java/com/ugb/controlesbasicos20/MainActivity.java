@@ -72,11 +72,22 @@ public class MainActivity extends AppCompatActivity {
                     String presentacion = tempVal.getText().toString();
 
                     tempVal = findViewById(R.id.txtPrec);
-                    String precio = tempVal.getText().toString();
+                    String precioStr = tempVal.getText().toString(); // Obteniendo el precio como String
+                    double precio = Double.parseDouble(precioStr); // Convertir el precio a double
+
+                    tempVal = findViewById(R.id.txtCos);
+                    String costoStr = tempVal.getText().toString(); // Obteniendo el costo como String
+                    double costo = Double.parseDouble(costoStr); // Convertir el costo a double
+
+                    tempVal = findViewById(R.id.txtSto);
+                    String stock = tempVal.getText().toString();
+
+                    // Calcular ganancia
+                    double ganancia = calcularGanancia(precio, costo);
 
                     String respuesta = "";
-                    if( di.hayConexionInternet() ) {
-                        //obtener datos a enviar al servidor
+                    if (di.hayConexionInternet()) {
+                        // Obtener datos a enviar al servidor
                         JSONObject datosProd = new JSONObject();
                         if (accion.equals("modificar")) {
                             datosProd.put("_id", id);
@@ -88,11 +99,16 @@ public class MainActivity extends AppCompatActivity {
                         datosProd.put("marca", marca);
                         datosProd.put("presentacion", presentacion);
                         datosProd.put("precio", precio);
+                        datosProd.put("costo", costo);
+                        datosProd.put("ganancia", ganancia); // Agregar ganancia al objeto JSON
+                        datosProd.put("stock", stock);
                         datosProd.put("urlCompletaFoto", urlCompletaFoto);
-                        //enviamos los datos
+
+                        // Enviamos los datos al servidor
                         enviarDatosServidor objGuardarDatosServidor = new enviarDatosServidor(getApplicationContext());
                         respuesta = objGuardarDatosServidor.execute(datosProd.toString()).get();
-                        //comprobacion de la respuesta
+
+                        // Comprobación de la respuesta
                         JSONObject respuestaJSONObject = new JSONObject(respuesta);
                         if (respuestaJSONObject.getBoolean("ok")) {
                             id = respuestaJSONObject.getString("id");
@@ -101,19 +117,20 @@ public class MainActivity extends AppCompatActivity {
                             respuesta = "Error al guardar en servidor: " + respuesta;
                         }
                     }
-                    String[] datos = new String[]{id, rev, idProd, codigo, descripcion, marca, presentacion, precio, urlCompletaFoto};
+                    String[] datos = new String[]{id, rev, idProd, codigo, descripcion, marca, presentacion, precioStr, costoStr, stock, urlCompletaFoto}; // Usar precioStr y costoStr
                     respuesta = db.administrar_prod(accion, datos);
                     if (respuesta.equals("ok")) {
-                        mostrarMsg("Producto registrado con exito.");
+                        mostrarMsg("Producto registrado con éxito.");
                         listarProd();
                     } else {
                         mostrarMsg("Error al intentar registrar el producto: " + respuesta);
                     }
-                }catch (Exception e){
-                    mostrarMsg("Error al guadar datos en el servidor o en SQLite: "+ e.getMessage());
+                } catch (Exception e) {
+                    mostrarMsg("Error al guardar datos en el servidor o en SQLite: " + e.getMessage());
                 }
             }
         });
+
         img = findViewById(R.id.btnImgProd);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +140,10 @@ public class MainActivity extends AppCompatActivity {
         });
         mostrarDatosProd();
     }
+    private double calcularGanancia(double precioVenta, double costo) {
+        return precioVenta - costo;
+    }
+
     private void tomarFotoProd(){
         tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         File fotoProd = null;
@@ -193,6 +214,12 @@ public class MainActivity extends AppCompatActivity {
 
                         tempVal = findViewById(R.id.txtPrec);
                         tempVal.setText(jsonObject.getString("precio"));
+
+                        tempVal = findViewById(R.id.txtCos);
+                        tempVal.setText(jsonObject.getString("costo"));
+
+                        tempVal = findViewById(R.id.txtSto);
+                        tempVal.setText(jsonObject.getString("stock"));
 
                         urlCompletaFoto = jsonObject.getString("urlCompletaFoto");
                         Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);

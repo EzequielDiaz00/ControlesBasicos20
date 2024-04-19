@@ -22,7 +22,7 @@
         android:hint="Codigo"
         android:layout_below="@id/btnImgProd"
         android:inputType="number"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
@@ -30,7 +30,7 @@
         android:hint="Descripcion"
         android:inputType="textMultiLine"
         android:layout_below="@id/txtCod"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
@@ -38,7 +38,7 @@
         android:hint="Marca"
         android:inputType="textMultiLine"
         android:layout_below="@id/txtDes"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
@@ -46,7 +46,7 @@
         android:hint="Presentacion"
         android:inputType="textMultiLine"
         android:layout_below="@id/txtMar"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
@@ -54,15 +54,35 @@
         android:hint="Precio"
         android:inputType="numberDecimal"
         android:layout_below="@id/txtPres"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/txtCos"
+        android:hint="Costo"
+        android:inputType="numberDecimal"
+        android:layout_below="@id/txtPrec"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/txtSto"
+        android:hint="Stock"
+        android:inputType="numberDecimal"
+        android:layout_below="@id/txtCos"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+
     <Button
         android:id="@+id/btnGuardarProd"
         android:text="GUARDAR PRODUCTO"
         android:layout_width="match_parent"
-        android:layout_below="@id/txtPrec"
-        android:layout_marginTop="40dp"
+        android:layout_below="@id/txtSto"
+        android:layout_marginTop="20dp"
         android:layout_height="wrap_content"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

@@ -64,7 +64,7 @@ public class ProductosActivity extends AppCompatActivity {
                 obtenerDatosProd();
             }
         } catch (Exception e) {
-            mostrarMsg("Error al cargar lista amigo: " + e.getMessage());
+            mostrarMsg("Error al cargar lista: " + e.getMessage());
         }
         buscarProd();
     }
@@ -100,6 +100,8 @@ public class ProductosActivity extends AppCompatActivity {
                             misDatosJSONObject.getString("marca"),
                             misDatosJSONObject.getString("presentacion"),
                             misDatosJSONObject.getString("precio"),
+                            misDatosJSONObject.getString("costo"),
+                            misDatosJSONObject.getString("stock"),
                             misDatosJSONObject.getString("urlCompletaFoto")
                     );
                     alProd.add(productosAdapter);
@@ -213,7 +215,9 @@ public class ProductosActivity extends AppCompatActivity {
                     jsonObject.put("marca", cProd.getString(5));
                     jsonObject.put("presentacion", cProd.getString(6));
                     jsonObject.put("precio", cProd.getString(7));
-                    jsonObject.put("urlCompletaFoto", cProd.getString(8));
+                    jsonObject.put("costo", cProd.getString(8));
+                    jsonObject.put("stock", cProd.getString(9));
+                    jsonObject.put("urlCompletaFoto", cProd.getString(10));
 
                     jsonObjectValue.put("value", jsonObject);
                     datosJSON.put(jsonObjectValue);
@@ -251,11 +255,15 @@ public class ProductosActivity extends AppCompatActivity {
                             String marca = producto.getMarca();
                             String presentacion = producto.getPresentacion();
                             String precio = producto.getPrecio();
+                            String costo= producto.getCosto();
+                            String stock = producto.getStock();
                             if (codigo.toLowerCase().trim().contains(valor) ||
                                     descripcion.toLowerCase().trim().contains(valor) ||
                                     marca.trim().contains(valor) ||
                                     presentacion.trim().toLowerCase().contains(valor) ||
-                                    precio.trim().contains(valor)) {
+                                    precio.trim().toLowerCase().contains(valor) ||
+                                    costo.trim().toLowerCase().contains(valor) ||
+                                    stock.trim().toLowerCase().contains(valor)) {
                                 alProd.add(producto);
                             }
                         }
