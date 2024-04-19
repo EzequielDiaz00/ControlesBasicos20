@@ -22,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -126,11 +127,18 @@ public class ProductosActivity extends AppCompatActivity {
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
 
-        // Asegurarse de que cProd no sea nulo y pueda moverse a la posición especificada
-        if (cProd != null && cProd.moveToPosition(info.position)) {
-            menu.setHeaderTitle(cProd.getString(1)); //1 es el nombre
+        // Verifica si hay datos JSON y si se puede mover a la posición específica
+        if (datosJSON != null && info.position >= 0 && info.position < datosJSON.length()) {
+            try {
+                JSONObject producto = datosJSON.getJSONObject(info.position).getJSONObject("value");
+                menu.setHeaderTitle(producto.getString("nombre")); // Suponiendo que "nombre" es el campo que deseas utilizar como título
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // Maneja cualquier excepción que pueda ocurrir al obtener el título del producto
+            }
         }
     }
+
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {

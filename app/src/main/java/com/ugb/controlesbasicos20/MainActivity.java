@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
                         Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                         img.setImageBitmap(imagenBitmap);
                     } else {
-                        mostrarMsg("El valor asociado con la clave 'productos' es nulo.");
+                        mostrarMsg("El valor asociado con la clave es nulo.");
                     }
                 } else { // Nuevos registros
                     idProd = utls.generarIdUnico();
@@ -238,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
             mostrarMsg("Error al mostrar los datos: " + e.getMessage());
         }
     }
+
 
 
     private void mostrarMsg(String msg){
