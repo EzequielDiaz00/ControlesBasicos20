@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <ImageButton
-        android:id="@+id/btnImgProd"
+        android:id="@+id/btnImgAuto"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_alignParentStart="true"
@@ -18,55 +18,55 @@
         android:src="@android:drawable/ic_menu_camera" />
 
     <EditText
-        android:id="@+id/txtCod"
-        android:hint="Codigo"
-        android:layout_below="@id/btnImgProd"
+        android:id="@+id/txtMar"
+        android:hint="Marca"
+        android:layout_below="@id/btnImgAuto"
         android:inputType="number"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/txtDes"
-        android:hint="Descripcion"
-        android:inputType="textMultiLine"
-        android:layout_below="@id/txtCod"
-        android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/txtMar"
-        android:hint="Marca"
-        android:inputType="textMultiLine"
-        android:layout_below="@id/txtDes"
-        android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-    <EditText
-        android:id="@+id/txtPres"
-        android:hint="Presentacion"
+        android:id="@+id/txtMot"
+        android:hint="Motor"
         android:inputType="textMultiLine"
         android:layout_below="@id/txtMar"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <EditText
-        android:id="@+id/txtPrec"
-        android:hint="Precio"
+        android:id="@+id/txtCha"
+        android:hint="Chasis"
+        android:inputType="textMultiLine"
+        android:layout_below="@id/txtMot"
+        android:layout_marginTop="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/txtVin"
+        android:hint="Vin"
+        android:inputType="textMultiLine"
+        android:layout_below="@id/txtCha"
+        android:layout_marginTop="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <EditText
+        android:id="@+id/txtCom"
+        android:hint="Combustion"
         android:inputType="numberDecimal"
-        android:layout_below="@id/txtPres"
+        android:layout_below="@id/txtVin"
         android:layout_marginTop="40dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
-        android:id="@+id/btnGuardarProd"
+        android:id="@+id/btnGuardarAuto"
         android:text="GUARDAR PRODUCTO"
         android:layout_width="match_parent"
-        android:layout_below="@id/txtPrec"
+        android:layout_below="@id/txtCom"
         android:layout_marginTop="40dp"
         android:layout_height="wrap_content"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabListaProd"
+        android:id="@+id/fabListaAuto"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="20dp"

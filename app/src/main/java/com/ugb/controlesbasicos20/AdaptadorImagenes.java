@@ -15,27 +15,26 @@ import java.util.ArrayList;
 
 public class AdaptadorImagenes extends BaseAdapter {
     Context context;
-    ArrayList<Producto> datosProductosArrayList;
+    ArrayList<Auto> datosAutosArrayList;
     LayoutInflater layoutInflater;
 
-    public AdaptadorImagenes(Context context, ArrayList<Producto> datosProductosArrayList) {
+    public AdaptadorImagenes(Context context, ArrayList<Auto> datosProductosArrayList) {
         this.context = context;
-        this.datosProductosArrayList = datosProductosArrayList;
+        this.datosAutosArrayList = datosAutosArrayList;
     }
 
     @Override
     public int getCount() {
-        return datosProductosArrayList.size();
+        return datosAutosArrayList.size();
     }
 
     @Override
-    public Object getItem(int i) {
-        return datosProductosArrayList.get(i);
+    public Object getItem(int i) { return datosAutosArrayList.get(i);
     }
 
     @Override
     public long getItemId(int i) {
-        return Long.parseLong(datosProductosArrayList.get(i).getIdProducto());
+        return Long.parseLong(datosAutosArrayList.get(i).getID());
     }
 
     @Override
@@ -44,19 +43,19 @@ public class AdaptadorImagenes extends BaseAdapter {
         View itemView = layoutInflater.inflate(R.layout.listview_imagenes, viewGroup, false);
 
         try {
-            Producto producto = datosProductosArrayList.get(i);
+            Auto auto = datosAutosArrayList.get(i);
 
-            TextView tempVal = itemView.findViewById(R.id.lblCod);
-            tempVal.setText(producto.getCodigo());
+            TextView tempVal = itemView.findViewById(R.id.lblMar);
+            tempVal.setText(auto.getMarca());
 
-            tempVal = itemView.findViewById(R.id.lblDes);
-            tempVal.setText(producto.getDescripcion());
+            tempVal = itemView.findViewById(R.id.lblMot);
+            tempVal.setText(auto.getMotor());
 
-            tempVal = itemView.findViewById(R.id.lblPrec);
-            tempVal.setText(producto.getPrecio());
+            tempVal = itemView.findViewById(R.id.lblCom);
+            tempVal.setText(auto.getCombustion());
 
             ImageView imgView = itemView.findViewById(R.id.imgFoto);
-            Bitmap imagenBitmap = BitmapFactory.decodeFile(producto.getFoto());
+            Bitmap imagenBitmap = BitmapFactory.decodeFile(auto.getFoto());
             imgView.setImageBitmap(imagenBitmap);
         } catch (Exception e) {
             Toast.makeText(context, "Error en Adaptador Imagenes: " + e.getMessage(), Toast.LENGTH_LONG).show();

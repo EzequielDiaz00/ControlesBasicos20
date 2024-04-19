@@ -1,5 +1,9 @@
 package com.ugb.controlesbasicos20;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,40 +19,36 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
-public class ProductosActivity extends AppCompatActivity {
+public class AutosActivity extends AppCompatActivity {
 
     Bundle parametros = new Bundle();
-    FloatingActionButton btnAgregarProd;
+    FloatingActionButton btnAgregarAuto;
     ListView lts;
-    Cursor cProd;
-    Producto productosAdapter;
+    Cursor cAuto;
+    Auto autosAdapter;
     DB db;
-    final ArrayList<Producto> alProd = new ArrayList<Producto>();
-    final ArrayList<Producto> alProdCopy = new ArrayList<Producto>();
+    final ArrayList<Auto> alAuto = new ArrayList<Auto>();
+    final ArrayList<Auto> alAutoCopy = new ArrayList<Auto>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_productos);
+        setContentView(R.layout.activity_autos);
 
-        btnAgregarProd = findViewById(R.id.fabAgregarProd);
-        btnAgregarProd.setOnClickListener(new View.OnClickListener() {
+        btnAgregarAuto = findViewById(R.id.fabAgregarAuto);
+        btnAgregarAuto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 parametros.putString("accion","nuevo");
                 abrirActividad(parametros);
             }
         });
-        obtenerDatosProd();
-        buscarProd();
+        obtenerDatosAuto();
+        buscarAuto();
     }
 
     @Override
@@ -58,8 +58,8 @@ public class ProductosActivity extends AppCompatActivity {
         inflater.inflate(R.menu.mimenu, menu);
 
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        cProd.moveToPosition(info.position);
-        menu.setHeaderTitle(cProd.getString(1)); //1 es el nombre
+        cAuto.moveToPosition(info.position);
+        menu.setHeaderTitle(cAuto.getString(1)); //1 es el nombre
     }
 
     @Override
@@ -71,21 +71,21 @@ public class ProductosActivity extends AppCompatActivity {
                 abrirActividad(parametros);
                 return true;
             } else if (itemId == R.id.mnxModificar) {
-                String[] productos = {
-                        cProd.getString(0), //idProd
-                        cProd.getString(1), //codigo
-                        cProd.getString(2), //descripcion
-                        cProd.getString(3), //marca
-                        cProd.getString(4), //presentacion
-                        cProd.getString(5), //precio
-                        cProd.getString(6), //foto
+                String[] autos = {
+                        cAuto.getString(0),
+                        cAuto.getString(1),
+                        cAuto.getString(2),
+                        cAuto.getString(3),
+                        cAuto.getString(4),
+                        cAuto.getString(5),
+                        cAuto.getString(6),
                 };
                 parametros.putString("accion", "modificar");
-                parametros.putStringArray("productos", productos);
+                parametros.putStringArray("autos", autos);
                 abrirActividad(parametros);
                 return true;
             } else if (itemId == R.id.mnxEliminar) {
-                eliminarProd();
+                eliminarAuto();
                 return true;
             }
             return super.onContextItemSelected(item);
@@ -95,20 +95,20 @@ public class ProductosActivity extends AppCompatActivity {
         }
     }
 
-    private void eliminarProd(){
+    private void eliminarAuto(){
         try{
-            AlertDialog.Builder confirmar = new AlertDialog.Builder(ProductosActivity.this);
+            AlertDialog.Builder confirmar = new AlertDialog.Builder(AutosActivity.this);
             confirmar.setTitle("Estás seguro de eliminar: ");
-            confirmar.setMessage(cProd.getString(1)); //1 es el nombre
+            confirmar.setMessage(cAuto.getString(1)); //1 es el nombre
             confirmar.setPositiveButton("SI", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
-                    String respuesta = db.administrar_prod("eliminar", new String[]{cProd.getString(0)});//0 es el idAmigo
+                    String respuesta = db.administrar_auto("eliminar", new String[]{cAuto.getString(0)});//0 es el idAmigo
                     if(respuesta.equals("ok")){
-                        mostrarMsg("Producto eliminado con éxito");
-                        obtenerDatosProd();
+                        mostrarMsg("Auto eliminado con éxito");
+                        obtenerDatosAuto();
                     } else {
-                        mostrarMsg("Error al eliminar el producto: "+ respuesta);
+                        mostrarMsg("Error al eliminar el auto: "+ respuesta);
                     }
                 }
             });
@@ -120,7 +120,7 @@ public class ProductosActivity extends AppCompatActivity {
             });
             confirmar.create().show();
         } catch (Exception e){
-            mostrarMsg("Error al eliminar producto: "+ e.getMessage());
+            mostrarMsg("Error al eliminar auto: "+ e.getMessage());
         }
     }
 
@@ -130,44 +130,44 @@ public class ProductosActivity extends AppCompatActivity {
         startActivity(abrirActividad);
     }
 
-    private void obtenerDatosProd(){
+    private void obtenerDatosAuto(){
         try {
-            alProd.clear();
-            alProdCopy.clear();
+            alAuto.clear();
+            alAutoCopy.clear();
 
-            db = new DB(ProductosActivity.this, "", null, 1);
-            cProd = db.consultar_prod();
+            db = new DB(AutosActivity.this, "", null, 1);
+            cAuto = db.consultar_auto();
 
-            if( cProd.moveToFirst() ){
-                lts = findViewById(R.id.ltsProd);
+            if( cAuto.moveToFirst() ){
+                lts = findViewById(R.id.ltsAuto);
                 do{
-                    Producto producto = new Producto(
-                            cProd.getString(0),//idProd
-                            cProd.getString(1),//codigo
-                            cProd.getString(2),//descripcion
-                            cProd.getString(3),//marca
-                            cProd.getString(4),//presentacion
-                            cProd.getString(5),//precio
-                            cProd.getString(6) //foto
+                    Auto auto = new Auto(
+                            cAuto.getString(0),
+                            cAuto.getString(1),
+                            cAuto.getString(2),
+                            cAuto.getString(3),
+                            cAuto.getString(4),
+                            cAuto.getString(5),
+                            cAuto.getString(6)
                     );
-                    alProd.add(producto);
-                } while(cProd.moveToNext());
-                alProdCopy.addAll(alProd);
+                    alAuto.add(auto);
+                } while(cAuto.moveToNext());
+                alAutoCopy.addAll(alAuto);
 
-                lts.setAdapter(new AdaptadorImagenes(ProductosActivity.this, alProd));
+                lts.setAdapter(new AdaptadorImagenes(AutosActivity.this, alAuto));
 
                 registerForContextMenu(lts);
             } else {
-                mostrarMsg("No hay Datos de amigos que mostrar.");
+                mostrarMsg("No hay datos que mostrar.");
             }
         } catch (Exception e){
             mostrarMsg("Error al mostrar datos: "+ e.getMessage());
         }
     }
 
-    private void buscarProd(){
+    private void buscarAuto(){
         TextView tempVal;
-        tempVal = findViewById(R.id.txtBuscarProd);
+        tempVal = findViewById(R.id.txtBuscarAuto);
         tempVal.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -177,23 +177,23 @@ public class ProductosActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 try {
-                    alProd.clear();
+                    alAuto.clear();
                     String valor = tempVal.getText().toString().trim().toLowerCase();
                     if (valor.length() <= 0) {
-                        alProd.addAll(alProdCopy);
+                        alAuto.addAll(alAutoCopy);
                     } else {
-                        for (Producto producto : alProdCopy) {
-                            String codigo = producto.getCodigo();
-                            String descripcion = producto.getDescripcion();
-                            String marca = producto.getMarca();
-                            String presentacion = producto.getPresentacion();
-                            String precio = producto.getPrecio();
-                            if (codigo.toLowerCase().trim().contains(valor) ||
-                                    descripcion.toLowerCase().trim().contains(valor) ||
-                                    marca.trim().contains(valor) ||
-                                    presentacion.trim().toLowerCase().contains(valor) ||
-                                    precio.trim().contains(valor)) {
-                                alProd.add(producto);
+                        for (Auto auto : alAutoCopy) {
+                            String marca = auto.getMarca();
+                            String motor = auto.getMotor();
+                            String chasis = auto.getChasis();
+                            String vin = auto.getVin();
+                            String combustion = auto.getCombustion();
+                            if (    marca.toLowerCase().trim().contains(valor) ||
+                                    motor.toLowerCase().trim().contains(valor) ||
+                                    chasis.trim().contains(valor) ||
+                                    vin.trim().toLowerCase().contains(valor) ||
+                                    combustion.trim().contains(valor)) {
+                                alAuto.add(auto);
                             }
                         }
                     }

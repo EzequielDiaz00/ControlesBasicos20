@@ -36,61 +36,61 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnRegresar = findViewById(R.id.fabListaProd);
+        btnRegresar = findViewById(R.id.fabListaAuto);
         btnRegresar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent regresarLista = new Intent(getApplicationContext(), ProductosActivity.class);
+                Intent regresarLista = new Intent(getApplicationContext(), AutosActivity.class);
                 startActivity(regresarLista);
             }
         });
-        btn = findViewById(R.id.btnGuardarProd);
+        btn = findViewById(R.id.btnGuardarAuto);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tempVal = findViewById(R.id.txtCod);
-                String codigo = tempVal.getText().toString();
-
-                tempVal = findViewById(R.id.txtDes);
-                String descripcion = tempVal.getText().toString();
-
                 tempVal = findViewById(R.id.txtMar);
                 String marca = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtPres);
-                String presentacion = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtMot);
+                String motor = tempVal.getText().toString();
 
-                tempVal = findViewById(R.id.txtPrec);
-                String precio = tempVal.getText().toString();
+                tempVal = findViewById(R.id.txtCha);
+                String chasis = tempVal.getText().toString();
 
-                String[] datos = new String[]{id,codigo,descripcion,marca,presentacion,precio, urlCompletaFoto};
+                tempVal = findViewById(R.id.txtVin);
+                String vin = tempVal.getText().toString();
+
+                tempVal = findViewById(R.id.txtCom);
+                String combustion = tempVal.getText().toString();
+
+                String[] datos = new String[]{id,marca,motor,chasis,vin,combustion,urlCompletaFoto};
                 DB db = new DB(getApplicationContext(),"", null, 1);
-                String respuesta = db.administrar_prod(accion, datos);
+                String respuesta = db.administrar_auto(accion, datos);
                 if( respuesta.equals("ok") ){
-                    mostrarMsg("Producto registrado con exito.");
-                    listarProd();
+                    mostrarMsg("Auto registrado con exito.");
+                    listarAuto();
                 }else {
-                    mostrarMsg("Error al intentar registrar el producto: "+ respuesta);
+                    mostrarMsg("Error al intentar registrar el Auto: "+ respuesta);
                 }
             }
         });
-        img = findViewById(R.id.btnImgProd);
+        img = findViewById(R.id.btnImgAuto);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tomarFotoProd();
+                tomarFotoAuto();
             }
         });
-        mostrarDatosProd();
+        mostrarDatosAuto();
     }
-    private void tomarFotoProd(){
+    private void tomarFotoAuto(){
         tomarFotoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File fotoProd = null;
+        File fotoAuto = null;
         try{
-            fotoProd = crearImagenamigo();
-            if( fotoProd!=null ){
+            fotoAuto = crearImagenamigo();
+            if( fotoAuto!=null ){
                 Uri urifotoAmigo = FileProvider.getUriForFile(MainActivity.this,
-                        "com.ugb.controlesbasicos.fileprovider", fotoProd);
+                        "com.ugb.controlesbasicos.fileprovider", fotoAuto);
                 tomarFotoIntent.putExtra(MediaStore.EXTRA_OUTPUT, urifotoAmigo);
                 startActivityForResult(tomarFotoIntent, 1);
             }else{
@@ -125,43 +125,43 @@ public class MainActivity extends AppCompatActivity {
         urlCompletaFoto = image.getAbsolutePath();
         return image;
     }
-    private void mostrarDatosProd(){
+    private void mostrarDatosAuto(){
         try{
             Bundle parametros = getIntent().getExtras();
             accion = parametros.getString("accion");
 
             if(accion.equals("modificar")){
-                String[] productos = parametros.getStringArray("productos");
-                id = productos[0];
-
-                tempVal = findViewById(R.id.txtCod);
-                tempVal.setText(productos[1]);
-
-                tempVal = findViewById(R.id.txtDes);
-                tempVal.setText(productos[2]);
+                String[] autos = parametros.getStringArray("autos");
+                id = autos[0];
 
                 tempVal = findViewById(R.id.txtMar);
-                tempVal.setText(productos[3]);
+                tempVal.setText(autos[1]);
 
-                tempVal = findViewById(R.id.txtPres);
-                tempVal.setText(productos[4]);
+                tempVal = findViewById(R.id.txtMot);
+                tempVal.setText(autos[2]);
 
-                tempVal = findViewById(R.id.txtPrec);
-                tempVal.setText(productos[5]);
+                tempVal = findViewById(R.id.txtCha);
+                tempVal.setText(autos[3]);
 
-                urlCompletaFoto = productos[6];
+                tempVal = findViewById(R.id.txtVin);
+                tempVal.setText(autos[4]);
+
+                tempVal = findViewById(R.id.txtCom);
+                tempVal.setText(autos[5]);
+
+                urlCompletaFoto = autos[6];
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                 img.setImageBitmap(imagenBitmap);
             }
         }catch (Exception e){
-            mostrarMsg("Error al mostrar los datos amigos");
+            mostrarMsg("Error al mostrar los datos");
         }
     }
     private void mostrarMsg(String msg){
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
-    private void listarProd(){
-        Intent intent = new Intent(getApplicationContext(), ProductosActivity.class);
+    private void listarAuto(){
+        Intent intent = new Intent(getApplicationContext(), AutosActivity.class);
         startActivity(intent);
     }
 }
