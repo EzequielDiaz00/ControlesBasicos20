@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     // Calcular ganancia
                     double ganancia = calcularGanancia(precio, costo);
 
-                    String respuesta = "";
+                    String respuesta = "", actualizado="no";
                     if (di.hayConexionInternet()) {
                         // Obtener datos a enviar al servidor
                         JSONObject datosProd = new JSONObject();
@@ -113,11 +113,12 @@ public class MainActivity extends AppCompatActivity {
                         if (respuestaJSONObject.getBoolean("ok")) {
                             id = respuestaJSONObject.getString("id");
                             rev = respuestaJSONObject.getString("rev");
+                            actualizado="si";
                         } else {
                             respuesta = "Error al guardar en servidor: " + respuesta;
                         }
                     }
-                    String[] datos = new String[]{id, rev, idProd, codigo, descripcion, marca, presentacion, precioStr, costoStr, stock, urlCompletaFoto}; // Usar precioStr y costoStr
+                    String[] datos = new String[]{id, rev, idProd, codigo, descripcion, marca, presentacion, precioStr, costoStr, stock, urlCompletaFoto, actualizado}; // Usar precioStr y costoStr
                     respuesta = db.administrar_prod(accion, datos);
                     if (respuesta.equals("ok")) {
                         mostrarMsg("Producto registrado con éxito.");

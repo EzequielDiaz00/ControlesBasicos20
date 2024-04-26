@@ -31,6 +31,7 @@ public class ProductosActivity extends AppCompatActivity {
 
     Bundle parametros = new Bundle();
     FloatingActionButton btnAgregarProd;
+    FloatingActionButton btn;
     ListView lts;
     Cursor cProd;
     Producto productosAdapter;
@@ -57,6 +58,15 @@ public class ProductosActivity extends AppCompatActivity {
                 abrirActividad(parametros);
             }
         });
+        btn = findViewById(R.id.fabSincronizarAmigos);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listarProd();
+            }
+        });
+        listarProd();
+        buscarProd();
         try {
             di = new detectarInternet(getApplicationContext());
             if (di.hayConexionInternet()) {
@@ -69,6 +79,73 @@ public class ProductosActivity extends AppCompatActivity {
         }
         buscarProd();
     }
+    private void listarProd(){
+        try{
+            di = new detectarInternet(getApplicationContext());
+            if( di.hayConexionInternet() ){//online
+                sincronizar();
+            }else{//offline
+                obtenerDatosProd();
+            }
+        }catch (Exception e){
+            mostrarMsg("Error al cargar lista amigo: "+ e.getMessage());
+        }
+    }
+    private void sincronizar(){
+        try{
+            cProd = db.pendienteSincronizar();
+            if( cProd.moveToFirst() ){//Hay datos pendientes de sincronizar
+                mostrarMsg("Sincronizado...");
+                jsonObject = new JSONObject();
+                do{
+                    if( cProd.getString(0).length()>0 && cProd.getString(1).length()>0 ){
+                        jsonObject.put("_id", cProd.getString(0));
+                        jsonObject.put("_rev", cProd.getString(1));
+                    }
+                    jsonObject.put("idProd", cProd.getString(2));
+                    jsonObject.put("codigo", cProd.getString(3));
+                    jsonObject.put("descripcion", cProd.getString(4));
+                    jsonObject.put("marca", cProd.getString(5));
+                    jsonObject.put("presentacion", cProd.getString(6));
+                    jsonObject.put("precio", cProd.getString(7));
+                    jsonObject.put("costo", cProd.getString(8));
+                    jsonObject.put("stock", cProd.getString(9));
+                    jsonObject.put("urlCompletaFoto", cProd.getString(10));
+                    jsonObject.put("actualizado", "si");
+
+                    enviarDatosServidor objGuardarDatosServidor = new enviarDatosServidor(getApplicationContext());
+                    String respuesta = objGuardarDatosServidor.execute(jsonObject.toString()).get();
+                    JSONObject respuestaJSONObject = new JSONObject(respuesta);
+                    if (respuestaJSONObject.getBoolean("ok")) {
+                        String[] datos = new String[]{
+                                respuestaJSONObject.getString("id"),
+                                respuestaJSONObject.getString("rev"),
+                                jsonObject.getString("idProd"),
+                                jsonObject.getString("codigo"),
+                                jsonObject.getString("descripcion"),
+                                jsonObject.getString("marca"),
+                                jsonObject.getString("presentacion"),
+                                jsonObject.getString("precio"),
+                                jsonObject.getString("costo"),
+                                jsonObject.getString("stock"),
+                                jsonObject.getString("urlCompletaFoto"),
+                                jsonObject.getString("actualizado")
+                        };
+                        respuesta = db.administrar_prod("modificar", datos);
+                        if( !respuesta.equals("ok") ){
+                            mostrarMsg("Error al guardar en local los datos sincronizados");
+                        }
+                    } else {
+                        mostrarMsg("Error al enviar los datos para sincronizar: "+ respuesta);
+                    }
+                }while (cProd.moveToNext());
+                mostrarMsg("Sincronizacion completa");
+            }
+            obtenerDatosProdServidor();
+        }catch (Exception e){
+            mostrarMsg("Error al sincronizar: "+ e.getMessage());
+        }
+    }
 
     private void obtenerDatosProdServidor() {
         try {
@@ -78,7 +155,7 @@ public class ProductosActivity extends AppCompatActivity {
             datosJSON = jsonObject.getJSONArray("rows");
             mostrarDatosProd();
         } catch (Exception e) {
-            mostrarMsg("Error al obtener datos del server: " + e.getMessage());
+            mostrarMsg("Error al obtener datos del server 1: " + e.getMessage());
         }
     }
 
