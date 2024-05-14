@@ -6,4 +6,22 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/lblStatus"
+        android:layout_margin="15dp"
+        android:hint="Status"
+        android:textSize="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btnCerrarSesion"
+        android:layout_below="@id/lblStatus"
+        android:text="Cerrar sesion"
+        android:textSize="25dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
 </RelativeLayout>
