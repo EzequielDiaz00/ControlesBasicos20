@@ -61,9 +61,18 @@ public class LoginActivity extends AppCompatActivity {
         barProgress = findViewById(R.id.barProgress);
 
         mAuth = FirebaseAuth.getInstance();
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id)) // Add this line to request an ID token.
+                .requestEmail()
+                .build();
         gsc = GoogleSignIn.getClient(this, gso);
 
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,17 +142,14 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
-                task.getResult(ApiException.class);
-                navigateToSecondActivity();
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
             } catch (ApiException e) {
-                Toast.makeText(this, "Error: " + e + "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Google sign in failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
             }
         }
-    }
 
-    void navigateToSecondActivity() {
-        finish();
-        Intent intent = new Intent(LoginActivity.this,MainActivity.class);
-        startActivity(intent);
     }
 }
