@@ -22,8 +22,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     Button btnRegister;
     Button btnLogin;
-    EditText txtEmail;
-    EditText txtPassword;
+    EditText txtName, txtEmail, txtPassword, txtPasswordConfirm;
     FirebaseAuth mAuth;
     ProgressBar barProgress;
 
@@ -43,11 +42,16 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        txtName = findViewById(R.id.txtNombre);
         txtEmail = findViewById(R.id.txtCorreo);
         txtPassword = findViewById(R.id.txtPassword);
+        txtPasswordConfirm = findViewById(R.id.txtPasswordConfirm);
+
         btnRegister = findViewById(R.id.btnRegister);
-        btnLogin = findViewById(R.id.btnLogin); // Initialize btnLogin
+        btnLogin = findViewById(R.id.btnLogin);
+
         barProgress = findViewById(R.id.barProgress);
+
         mAuth = FirebaseAuth.getInstance();
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
@@ -63,9 +67,12 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 barProgress.setVisibility(View.VISIBLE);
-                String email, password;
+
+                String email, password, passwordConfirm;
+
                 email = txtEmail.getText().toString();
                 password = txtPassword.getText().toString();
+                passwordConfirm = txtPasswordConfirm.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(RegisterActivity.this, "Ingrese el correo", Toast.LENGTH_SHORT).show();
@@ -75,6 +82,14 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                if (TextUtils.isEmpty(passwordConfirm)) {
+                    Toast.makeText(RegisterActivity.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!password.equals(passwordConfirm)){
+                    Toast.makeText(RegisterActivity.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -82,9 +97,14 @@ public class RegisterActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 barProgress.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
+                                    String userNameCorreo = txtName.getText().toString();
+
                                     Toast.makeText(RegisterActivity.this, "Usuario creado",
                                             Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+
+                                    // Redirigir a MainActivity después de registrar el usuario
+                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    intent.putExtra("USERNAME", userNameCorreo);
                                     startActivity(intent);
                                     finish();
                                 } else {

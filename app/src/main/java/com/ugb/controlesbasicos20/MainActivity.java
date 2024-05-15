@@ -50,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String userNameCorreo = getIntent().getStringExtra("USERNAME");
+
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         lblStatus = findViewById(R.id.lblStatus);
         lblStatus2 = findViewById(R.id.lblStatus2);
@@ -64,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
-            String userName = acct.getDisplayName();
+            String userNameGoogle = acct.getDisplayName();
             String emailAdd = acct.getEmail();
 
-            lblStatus.setText(userName);
+            lblStatus.setText(userNameGoogle);
             lblStatus2.setText(emailAdd);
         } else {
             if (user == null) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                lblStatus.setText(user.getDisplayName());
+                lblStatus.setText(userNameCorreo);
                 lblStatus2.setText(user.getEmail());
             }
         }
