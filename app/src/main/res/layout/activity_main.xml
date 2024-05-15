@@ -15,9 +15,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <TextView
+        android:layout_below="@+id/lblStatus"
+        android:id="@+id/lblStatus2"
+        android:layout_margin="15dp"
+        android:hint="Status"
+        android:textSize="50dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
     <Button
         android:id="@+id/btnCerrarSesion"
-        android:layout_below="@id/lblStatus"
+        android:layout_below="@id/lblStatus2"
         android:text="Cerrar sesion"
         android:textSize="25dp"
         android:layout_centerHorizontal="true"

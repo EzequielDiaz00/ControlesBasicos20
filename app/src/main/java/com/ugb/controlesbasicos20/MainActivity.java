@@ -17,6 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -32,8 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     Button btnCerrarSesion;
     TextView lblStatus;
+    TextView lblStatus2;
     FirebaseAuth auth;
     FirebaseUser user;
+    GoogleSignInOptions gso;
+    GoogleSignInClient gsc;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,15 +49,27 @@ public class MainActivity extends AppCompatActivity {
 
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         lblStatus = findViewById(R.id.lblStatus);
+        lblStatus2 = findViewById(R.id.lblStatus2);
         auth = FirebaseAuth.getInstance();
         user = auth.getCurrentUser();
+
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        gsc = GoogleSignIn.getClient(this, gso);
+
+        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+        if (acct != null) {
+            String userName = acct.getDisplayName();
+            String emailAdd = acct.getEmail();
+
+            lblStatus.setText(userName);
+            lblStatus2.setText(emailAdd);
+        }
 
         if (user == null) {
             Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(intent);
             finish();
-        }
-        else {
+        } else {
             lblStatus.setText(user.getEmail());
         }
 

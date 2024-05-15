@@ -6,9 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".LoginActivity">
 
+    <TextView
+        android:id="@+id/lblTittle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Iniciar Sesion"
+        android:textSize="25dp" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/lblTittle"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
@@ -31,36 +41,52 @@
             android:hint="Contraseña"
             android:inputType="textPassword" />
 
-        <ProgressBar
-            android:id="@+id/barProgress"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_margin="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical">
 
             <Button
                 android:id="@+id/btnLogin"
-                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Acceder" />
 
-            <Space
-                android:layout_width="10dp"
+            <TextView
+                android:id="@+id/lblOption"
+                android:layout_gravity="center"
+                android:layout_marginTop="100dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0" />
+                android:text="No tengo una cuenta"
+                android:textSize="15dp" />
 
             <Button
                 android:id="@+id/btnRegister"
-                android:layout_width="wrap_content"
+                android:layout_gravity="center"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Registrar" />
-        </LinearLayout>
+                android:text="Registrarme" />
 
+            <Button
+                android:id="@+id/btnSiginGoogle"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Iniciar sesion con Google"
+                app:icon="@drawable/googleg_standard_color_18" />
+
+            <ProgressBar
+                android:id="@+id/barProgress"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
