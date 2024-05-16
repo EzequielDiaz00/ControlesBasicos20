@@ -24,7 +24,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     Button btnCerrarSesion;
-    TextView lblNameUser, lblEmailUser, lblNameUserDB, lblEmailUserDB;
+    TextView lblNameUser, lblEmailUser;
     FirebaseAuth auth;
     FirebaseUser userEmailAuth;
     GoogleSignInOptions gso;
@@ -58,8 +58,6 @@ public class MainActivity extends AppCompatActivity {
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         lblNameUser = findViewById(R.id.lblNameUser);
         lblEmailUser = findViewById(R.id.lblEmailUser);
-        lblNameUserDB = findViewById(R.id.lblNameUserDB);
-        lblEmailUserDB = findViewById(R.id.lblEmailUserDB);
         auth = FirebaseAuth.getInstance();
         userEmailAuth = auth.getCurrentUser();
     }
@@ -84,8 +82,9 @@ public class MainActivity extends AppCompatActivity {
             String userNameGoogle = acct.getDisplayName();
             String userEmailGoogle = acct.getEmail();
 
-            lblNameUser.setText(userNameGoogle);
-            lblEmailUser.setText(userEmailGoogle);
+            //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////////
+            /*lblNameUser.setText(userNameGoogle);
+            lblEmailUser.setText(userEmailGoogle);*/
 
             ContentValues values = new ContentValues();
             values.put(DBManage360.TableUser.COLUMN_NOMBRE, userNameGoogle);
@@ -99,10 +98,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
-                lblNameUser.setText(userNameCorreo);
-                lblEmailUser.setText(userEmailAuth.getEmail());
-                String userEmailCorreo = userEmailAuth.getEmail().toString();
+                //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////
+                /*lblNameUser.setText(userNameCorreo);
+                lblEmailUser.setText(userEmailAuth.getEmail());*/
 
+                String userEmailCorreo = userEmailAuth.getEmail().toString();
 
                 ContentValues values = new ContentValues();
                 values.put(DBManage360.TableUser.COLUMN_NOMBRE, userNameCorreo);
@@ -140,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
             String nombreFromDB = cursor.getString(nombreIndex);
             String correoFromDB = cursor.getString(correoIndex);
 
-            lblNameUserDB.setText(nombreFromDB);
-            lblEmailUserDB.setText(correoFromDB);
+            lblNameUser.setText(nombreFromDB);
+            lblEmailUser.setText(correoFromDB);
 
             cursor.close();
         } else {

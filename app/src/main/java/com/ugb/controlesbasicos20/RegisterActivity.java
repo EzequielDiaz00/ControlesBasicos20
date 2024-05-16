@@ -66,8 +66,6 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                barProgress.setVisibility(View.VISIBLE);
-
                 String email, password, passwordConfirm;
 
                 email = txtEmail.getText().toString();
@@ -91,6 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
+                barProgress.setVisibility(View.VISIBLE);
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -99,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     String userNameCorreo = txtName.getText().toString();
 
-                                    Toast.makeText(RegisterActivity.this, "Usuario creado",
+                                    Toast.makeText(RegisterActivity.this, "¡Usuario creado exitosamente!",
                                             Toast.LENGTH_SHORT).show();
 
                                     // Redirigir a MainActivity después de registrar el usuario

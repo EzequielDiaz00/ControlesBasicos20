@@ -86,20 +86,20 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                barProgress.setVisibility(View.VISIBLE);
                 String email, password;
                 email = txtEmail.getText().toString();
                 password = txtPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(LoginActivity.this, "Ingrese el correo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Ingrese su dirección de correo electrónico", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "Ingrese su contraseña", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
+                barProgress.setVisibility(View.VISIBLE);
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                             @Override
@@ -112,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Incio fallido",
+                                    Toast.makeText(LoginActivity.this, "Hubo un error al iniciar sesión",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -147,7 +147,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } catch (ApiException e) {
-                Toast.makeText(this, "Google sign in failed: " + e.getStatusCode(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error al iniciar sesión con Google: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
 

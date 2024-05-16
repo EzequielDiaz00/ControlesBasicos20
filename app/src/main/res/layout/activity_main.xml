@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_margin="15dp"
-        android:hint="Status"
+        android:hint="Name"
         android:textSize="30dp" />
 
     <TextView
@@ -22,8 +22,8 @@
         android:layout_below="@+id/lblNameUser"
         android:layout_centerHorizontal="true"
         android:layout_margin="15dp"
-        android:hint="Status"
-        android:textSize="30dp" />
+        android:hint="Email"
+        android:textSize="20dp" />
 
     <Button
         android:id="@+id/btnCerrarSesion"
@@ -34,25 +34,5 @@
         android:layout_margin="15dp"
         android:text="Cerrar sesion"
         android:textSize="25dp" />
-
-    <TextView
-        android:id="@+id/lblNameUserDB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnCerrarSesion"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="15dp"
-        android:hint="Status"
-        android:textSize="30dp" />
-
-    <TextView
-        android:id="@+id/lblEmailUserDB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/lblNameUserDB"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="15dp"
-        android:hint="Status"
-        android:textSize="30dp" />
 
 </RelativeLayout>
