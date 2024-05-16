@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     FirebaseUser userEmailAuth;
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
-    DBManage360 dbManage360;
+    DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
     SQLiteDatabase dbRead;
 
@@ -71,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupDatabase() {
-        dbManage360 = new DBManage360(this);
-        dbWrite = dbManage360.getWritableDatabase();
-        dbRead = dbManage360.getReadableDatabase();
+        dbSqlite = new DBSqlite(this);
+        dbWrite = dbSqlite.getWritableDatabase();
+        dbRead = dbSqlite.getReadableDatabase();
     }
 
     private void displayUserData(String userNameCorreo) {
@@ -87,9 +87,9 @@ public class MainActivity extends AppCompatActivity {
             lblEmailUser.setText(userEmailGoogle);*/
 
             ContentValues values = new ContentValues();
-            values.put(DBManage360.TableUser.COLUMN_NOMBRE, userNameGoogle);
-            values.put(DBManage360.TableUser.COLUMN_CORREO, userEmailGoogle);
-            long newRowId = dbWrite.insert(DBManage360.TableUser.TABLE_USER, null, values);
+            values.put(DBSqlite.TableUser.COLUMN_NOMBRE, userNameGoogle);
+            values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailGoogle);
+            long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
             showDataFromDatabase(userEmailGoogle);
         } else {
@@ -105,9 +105,9 @@ public class MainActivity extends AppCompatActivity {
                 String userEmailCorreo = userEmailAuth.getEmail().toString();
 
                 ContentValues values = new ContentValues();
-                values.put(DBManage360.TableUser.COLUMN_NOMBRE, userNameCorreo);
-                values.put(DBManage360.TableUser.COLUMN_CORREO, userEmailCorreo);
-                long newRowId = dbWrite.insert(DBManage360.TableUser.TABLE_USER, null, values);
+                values.put(DBSqlite.TableUser.COLUMN_NOMBRE, userNameCorreo);
+                values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailCorreo);
+                long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
                 showDataFromDatabase(userEmailCorreo);
             }
@@ -116,15 +116,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void showDataFromDatabase(String userEmail) {
         String[] projection = {
-                DBManage360.TableUser.COLUMN_NOMBRE,
-                DBManage360.TableUser.COLUMN_CORREO
+                DBSqlite.TableUser.COLUMN_NOMBRE,
+                DBSqlite.TableUser.COLUMN_CORREO
         };
 
-        String selection = DBManage360.TableUser.COLUMN_CORREO + " = ?";
+        String selection = DBSqlite.TableUser.COLUMN_CORREO + " = ?";
         String[] selectionArgs = {userEmail};
 
         Cursor cursor = dbRead.query(
-                DBManage360.TableUser.TABLE_USER,
+                DBSqlite.TableUser.TABLE_USER,
                 projection,
                 selection,
                 selectionArgs,
@@ -134,8 +134,8 @@ public class MainActivity extends AppCompatActivity {
         );
 
         if (cursor != null && cursor.moveToFirst()) {
-            int nombreIndex = cursor.getColumnIndex(DBManage360.TableUser.COLUMN_NOMBRE);
-            int correoIndex = cursor.getColumnIndex(DBManage360.TableUser.COLUMN_CORREO);
+            int nombreIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_NOMBRE);
+            int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
 
             String nombreFromDB = cursor.getString(nombreIndex);
             String correoFromDB = cursor.getString(correoIndex);
