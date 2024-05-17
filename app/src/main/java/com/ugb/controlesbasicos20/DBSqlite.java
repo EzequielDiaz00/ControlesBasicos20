@@ -13,13 +13,33 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String TABLE_USER = "Users";
         public static final String COLUMN_NOMBRE = "Nombre";
         public static final String COLUMN_CORREO = "Correo";
+        public static final String COLUMN_FOTO = "Foto";
     }
 
-    private static final String SQL_CREATE_TABLE =
+    public static class TableProd implements BaseColumns {
+        public static final String TABLE_PROD = "Productos";
+        public static final String COLUMN_CODIGO = "Codigo";
+        public static final String COLUMN_NOMBRE = "Nombre";
+        public static final String COLUMN_MARCA = "Marca";
+        public static final String COLUMN_DESCRIPCION = "Descripcion";
+        public static final String COLUMN_PRECIO = "Precio";
+    }
+
+    private static final String SQL_CREATE_TABLE_USER =
             "CREATE TABLE " + TableUser.TABLE_USER + " (" +
                     TableUser._ID + " INTEGER PRIMARY KEY," +
                     TableUser.COLUMN_NOMBRE + " TEXT," +
-                    TableUser.COLUMN_CORREO + " TEXT)";
+                    TableUser.COLUMN_CORREO + " TEXT," +
+                    TableUser.COLUMN_FOTO + " TEXT)";
+
+    private static final String SQL_CREATE_TABLE_PROD =
+            "CREATE TABLE " + TableProd.TABLE_PROD + " (" +
+                    TableProd._ID + " INTEGER PRIMARY KEY," +
+                    TableProd.COLUMN_CODIGO + " TEXT," +
+                    TableProd.COLUMN_NOMBRE + " TEXT," +
+                    TableProd.COLUMN_MARCA + " TEXT," +
+                    TableProd.COLUMN_DESCRIPCION + " TEXT," +
+                    TableProd.COLUMN_PRECIO + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TableUser.TABLE_USER;
@@ -30,7 +50,8 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(SQL_CREATE_TABLE);
+        db.execSQL(SQL_CREATE_TABLE_USER);
+        db.execSQL(SQL_CREATE_TABLE_PROD);
     }
 
     @Override

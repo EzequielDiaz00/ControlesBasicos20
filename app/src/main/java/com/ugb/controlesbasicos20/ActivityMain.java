@@ -2,18 +2,22 @@ package com.ugb.controlesbasicos20;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.Manifest;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -25,10 +29,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +40,7 @@ import java.util.Map;
 public class ActivityMain extends AppCompatActivity {
 
     TabHost tbhMain;
-    Button btnCerrarSesion;
+    Button btnCerrarSesion, btnFotoUser, btnAbrirProductos;
     TextView lblNameUser, lblEmailUser;
     FirebaseAuth auth;
     FirebaseUser userEmailAuth;
@@ -46,6 +50,31 @@ public class ActivityMain extends AppCompatActivity {
     SQLiteDatabase dbWrite;
     SQLiteDatabase dbRead;
     FirebaseFirestore databaseFirebase;
+    FirebaseStorage storageFirebase;
+    StorageReference storageRef;
+    private static final int REQUEST_CAMERA_PERMISSION = 100;
+
+    private void checkCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        } else {
+            ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
+            classFoto.tomarFoto();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
+                classFoto.tomarFoto();
+            } else {
+                Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +95,23 @@ public class ActivityMain extends AppCompatActivity {
                 signOut();
             }
         });
+
+        btnFotoUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkCameraPermission();
+                ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
+                classFoto.tomarFoto();
+            }
+        });
+
+        btnAbrirProductos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initializeViews() {
@@ -77,12 +123,16 @@ public class ActivityMain extends AppCompatActivity {
         tbhMain.addTab(tbhMain.newTabSpec("FIN").setContent(R.id.tabFinanzas).setIndicator("Finanzas", null));
         tbhMain.setCurrentTab(1);
 
+        btnAbrirProductos = findViewById(R.id.btnVistaProductos);
+        btnFotoUser = findViewById(R.id.btnFotoUser);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         lblNameUser = findViewById(R.id.lblNameUser);
         lblEmailUser = findViewById(R.id.lblEmailUser);
         auth = FirebaseAuth.getInstance();
         userEmailAuth = auth.getCurrentUser();
         databaseFirebase = FirebaseFirestore.getInstance();
+        storageFirebase = FirebaseStorage.getInstance();
+        storageRef = storageFirebase.getReference();
     }
 
     private void setupGoogleSignIn() {
@@ -174,7 +224,7 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
-    private void insertDataToFirestore(String userName, String userEmail) {
+    public void insertDataToFirestore(String userName, String userEmail) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("nombre", userName);
         userData.put("correo", userEmail);
