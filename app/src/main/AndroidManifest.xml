@@ -21,16 +21,19 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".AddProdActivity"
+            android:name=".ActivityProductos"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ActivityAddProd"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".ActivityRegister"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ActivityMain"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityLogin"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,7 +1,6 @@
 package com.ugb.controlesbasicos20;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -13,7 +12,6 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -25,7 +23,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivity extends AppCompatActivity {
+public class ActivityLogin extends AppCompatActivity {
 
     Button btnRegister;
     Button btnLogin;
@@ -42,7 +40,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
             startActivity(intent);
             finish();
         }
@@ -69,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
             startActivity(intent);
             finish();
         }
@@ -77,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ActivityRegister.class);
                 startActivity(intent);
                 finish();
             }
@@ -91,11 +89,11 @@ public class LoginActivity extends AppCompatActivity {
                 password = txtPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(LoginActivity.this, "Ingrese su dirección de correo electrónico", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityLogin.this, "Ingrese su dirección de correo electrónico", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(LoginActivity.this, "Ingrese su contraseña", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityLogin.this, "Ingrese su contraseña", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -108,11 +106,11 @@ public class LoginActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(getApplicationContext(), "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
 
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(LoginActivity.this, "Hubo un error al iniciar sesión",
+                                    Toast.makeText(ActivityLogin.this, "Hubo un error al iniciar sesión",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -143,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
 
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
                 startActivity(intent);
                 finish();
             } catch (ApiException e) {

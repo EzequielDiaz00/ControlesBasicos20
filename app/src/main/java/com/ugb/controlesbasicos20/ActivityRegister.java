@@ -18,7 +18,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class RegisterActivity extends AppCompatActivity {
+public class ActivityRegister extends AppCompatActivity {
 
     Button btnRegister;
     Button btnLogin;
@@ -31,7 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onStart();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if(currentUser != null){
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
             startActivity(intent);
             finish();
         }
@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), ActivityLogin.class);
                 startActivity(intent);
                 finish();
             }
@@ -73,19 +73,19 @@ public class RegisterActivity extends AppCompatActivity {
                 passwordConfirm = txtPasswordConfirm.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
-                    Toast.makeText(RegisterActivity.this, "Ingrese el correo", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityRegister.this, "Ingrese el correo", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (TextUtils.isEmpty(password)) {
-                    Toast.makeText(RegisterActivity.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityRegister.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (TextUtils.isEmpty(passwordConfirm)) {
-                    Toast.makeText(RegisterActivity.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityRegister.this, "Ingrese la contraseña", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!password.equals(passwordConfirm)){
-                    Toast.makeText(RegisterActivity.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityRegister.this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -98,16 +98,16 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     String userNameCorreo = txtName.getText().toString();
 
-                                    Toast.makeText(RegisterActivity.this, "¡Usuario creado exitosamente!",
+                                    Toast.makeText(ActivityRegister.this, "¡Usuario creado exitosamente!",
                                             Toast.LENGTH_SHORT).show();
 
                                     // Redirigir a MainActivity después de registrar el usuario
-                                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                                    Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
                                     intent.putExtra("USERNAME", userNameCorreo);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(RegisterActivity.this, "Error al crear el usuario",
+                                    Toast.makeText(ActivityRegister.this, "Error al crear el usuario",
                                             Toast.LENGTH_SHORT).show();
                                 }
                             }
