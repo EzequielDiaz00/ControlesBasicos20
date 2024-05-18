@@ -42,6 +42,7 @@ public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
     Button btnCerrarSesion, btnFotoUser, btnAbrirProductos;
     TextView lblNameUser, lblEmailUser;
+    ClassFoto classFoto;
     FirebaseAuth auth;
     FirebaseUser userEmailAuth;
     GoogleSignInOptions gso;
@@ -58,7 +59,6 @@ public class ActivityMain extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         } else {
-            ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
             classFoto.tomarFoto();
         }
     }
@@ -68,7 +68,6 @@ public class ActivityMain extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
                 classFoto.tomarFoto();
             } else {
                 Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
@@ -100,8 +99,6 @@ public class ActivityMain extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkCameraPermission();
-                ClassFoto classFoto = new ClassFoto(ActivityMain.this, null);
-                classFoto.tomarFoto();
             }
         });
 
@@ -123,6 +120,7 @@ public class ActivityMain extends AppCompatActivity {
         tbhMain.addTab(tbhMain.newTabSpec("FIN").setContent(R.id.tabFinanzas).setIndicator("Finanzas", null));
         tbhMain.setCurrentTab(1);
 
+        classFoto = new ClassFoto(ActivityMain.this);
         btnAbrirProductos = findViewById(R.id.btnVistaProductos);
         btnFotoUser = findViewById(R.id.btnFotoUser);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);

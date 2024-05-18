@@ -6,13 +6,15 @@ public class ClassProductos {
     private String marca;
     private String descripcion;
     private Double precio;
+    private String foto;
 
-    public ClassProductos(String codigo, String nombre, String marca, String descripcion, Double precio) {
+    public ClassProductos(String codigo, String nombre, String marca, String descripcion, Double precio, String foto) {
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
         this.descripcion = descripcion;
         this.precio = precio;
+        this.foto = foto;
     }
 
     public String getCodigo() {
@@ -34,4 +36,6 @@ public class ClassProductos {
     public Double getPrecio() {
         return precio;
     }
+
+    public String getFoto() {return foto;}
 }

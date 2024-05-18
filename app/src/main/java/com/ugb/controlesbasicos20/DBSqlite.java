@@ -23,6 +23,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_MARCA = "Marca";
         public static final String COLUMN_DESCRIPCION = "Descripcion";
         public static final String COLUMN_PRECIO = "Precio";
+        public static final String COLUMN_FOTO = "Foto";
     }
 
     private static final String SQL_CREATE_TABLE_USER =
@@ -39,7 +40,8 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableProd.COLUMN_NOMBRE + " TEXT," +
                     TableProd.COLUMN_MARCA + " TEXT," +
                     TableProd.COLUMN_DESCRIPCION + " TEXT," +
-                    TableProd.COLUMN_PRECIO + " TEXT)";
+                    TableProd.COLUMN_PRECIO + " TEXT," +
+                    TableProd.COLUMN_FOTO + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + TableUser.TABLE_USER;

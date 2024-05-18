@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -54,7 +55,8 @@ public class ActivityProductos extends AppCompatActivity {
                 DBSqlite.TableProd.COLUMN_CODIGO,
                 DBSqlite.TableProd.COLUMN_NOMBRE,
                 DBSqlite.TableProd.COLUMN_MARCA,
-                DBSqlite.TableProd.COLUMN_PRECIO
+                DBSqlite.TableProd.COLUMN_PRECIO,
+                DBSqlite.TableProd.COLUMN_FOTO
         };
 
         Cursor cursor = null;
@@ -75,14 +77,17 @@ public class ActivityProductos extends AppCompatActivity {
                     int nombreIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_NOMBRE);
                     int marcaIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_MARCA);
                     int precioIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_PRECIO);
+                    int fotoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_FOTO);
+                    Log.d("ActivityProd", "Foto basedata: " + fotoIndex);
 
                     if (codigoIndex != -1 && nombreIndex != -1 && precioIndex != -1) {
                         String codigo = cursor.getString(codigoIndex);
                         String nombre = cursor.getString(nombreIndex);
                         String marca = cursor.getString(marcaIndex);
                         Double precio = Double.valueOf(cursor.getString(precioIndex));
+                        String foto = cursor.getString(fotoIndex);
 
-                        productos.add(new ClassProductos(codigo, nombre, marca, null, precio));
+                        productos.add(new ClassProductos(codigo, nombre, marca, null, precio, foto));
                     } else {
                         Toast.makeText(this, "Error al extraer datos de la base de datos", Toast.LENGTH_SHORT).show();
                     }

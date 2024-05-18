@@ -29,12 +29,10 @@ import java.util.Map;
 
 public class ClassFoto {
     private Activity activity;
-    private ImageView ivFotoUser;
     public String urlCompletaFoto;
 
-    public ClassFoto(Activity activity, ImageView ivFotoUser) {
+    public ClassFoto(Activity activity) {
         this.activity = activity;
-        this.ivFotoUser = ivFotoUser;
     }
 
     public void tomarFoto() {
@@ -59,8 +57,9 @@ public class ClassFoto {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         try {
             if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-                Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
-                ivFotoUser.setImageBitmap(imagenBitmap);
+                //Mostrar la foto///////////////////////////////////////////////////////////////////
+                /*Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
+                ivFotoUser.setImageBitmap(imagenBitmap);*/
             } else {
                 Toast.makeText(activity, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
             }
