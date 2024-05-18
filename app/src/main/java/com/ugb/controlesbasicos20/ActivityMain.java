@@ -1,19 +1,25 @@
 package com.ugb.controlesbasicos20;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -33,13 +39,16 @@ import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
     Button btnCerrarSesion, btnFotoUser, btnAbrirProductos;
-    TextView lblNameUser, lblEmailUser;
+    TextView lblNameUser, lblEmailUser, lblTypeAcc;
+    ImageView imgFotoUser;
     ClassFoto classFoto;
     FirebaseAuth auth;
     FirebaseUser userEmailAuth;
@@ -54,6 +63,7 @@ public class ActivityMain extends AppCompatActivity {
     StorageReference storageRef;
     private static final int REQUEST_CAMERA_PERMISSION = 100;
     public static String userEmailLogin;
+    String urlFotoUser;
 
     private void checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -72,6 +82,25 @@ public class ActivityMain extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Permiso de cámara denegado", Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        try {
+            if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+                String urlCompletaFoto = classFoto.urlCompletaFoto;
+                urlFotoUser = urlCompletaFoto;
+                Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
+                imgFotoUser.setImageBitmap(imagenBitmap);
+                insertFotoUser(userEmailLogin, urlFotoUser);
+                showFotoUser(urlFotoUser, userEmailLogin);
+            } else {
+                Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "No se pudo tomar la foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 
@@ -126,6 +155,8 @@ public class ActivityMain extends AppCompatActivity {
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         lblNameUser = findViewById(R.id.lblNameUser);
         lblEmailUser = findViewById(R.id.lblEmailUser);
+        lblTypeAcc = findViewById(R.id.lblTypeAcc);
+        imgFotoUser = findViewById(R.id.imgFotoUser);
         auth = FirebaseAuth.getInstance();
         userEmailAuth = auth.getCurrentUser();
         databaseFirebase = FirebaseFirestore.getInstance();
@@ -146,24 +177,24 @@ public class ActivityMain extends AppCompatActivity {
         dbWrite = dbSqlite.getWritableDatabase();
         dbRead = dbSqlite.getReadableDatabase();
     }
+
     private void displayUserData(String userNameCorreo) {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
             userType = "Google";
             String userNameGoogle = acct.getDisplayName();
             String userEmailGoogle = acct.getEmail();
+            urlFotoUser = classFoto.urlCompletaFoto;
             userEmailLogin = userEmailGoogle;
-
-            //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////////
-            /*lblNameUser.setText(userNameGoogle);
-            lblEmailUser.setText(userEmailGoogle);*/
 
             ContentValues values = new ContentValues();
             values.put(DBSqlite.TableUser.COLUMN_NOMBRE, userNameGoogle);
             values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailGoogle);
+            values.put(DBSqlite.TableUser.COLUMN_TYPE, userType);
+            values.put(DBSqlite.TableUser.COLUMN_FOTO, urlFotoUser);
             long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-            insertDataToFirestoreUser(userNameGoogle, userEmailGoogle, userType);
+            insertDataToFirestoreUser(userNameGoogle, userEmailGoogle, userType, urlFotoUser);
             showDataFromDatabase(userEmailGoogle);
         } else {
             if (userEmailAuth == null) {
@@ -172,10 +203,6 @@ public class ActivityMain extends AppCompatActivity {
                 finish();
             } else {
 
-                //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////
-                /*lblNameUser.setText(userNameCorreo);
-                lblEmailUser.setText(userEmailAuth.getEmail());*/
-
                 userType = "Email";
                 String userEmailCorreo = userEmailAuth.getEmail().toString();
                 userEmailLogin = userEmailCorreo;
@@ -183,18 +210,24 @@ public class ActivityMain extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put(DBSqlite.TableUser.COLUMN_NOMBRE, userNameCorreo);
                 values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailCorreo);
+                values.put(DBSqlite.TableUser.COLUMN_TYPE, userType);
+                values.put(DBSqlite.TableUser.COLUMN_FOTO, urlFotoUser);
                 long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-                insertDataToFirestoreUser(userNameCorreo, userEmailCorreo, userType);
+                insertDataToFirestoreUser(userNameCorreo, userEmailCorreo, userType, urlFotoUser);
                 showDataFromDatabase(userEmailCorreo);
             }
         }
     }
 
     private void showDataFromDatabase(String userEmail) {
+        List<ClassUser> users = new ArrayList<>();
+
         String[] projection = {
                 DBSqlite.TableUser.COLUMN_NOMBRE,
-                DBSqlite.TableUser.COLUMN_CORREO
+                DBSqlite.TableUser.COLUMN_CORREO,
+                DBSqlite.TableUser.COLUMN_TYPE,
+                //DBSqlite.TableUser.COLUMN_FOTO
         };
 
         String selection = DBSqlite.TableUser.COLUMN_CORREO + " = ?";
@@ -210,25 +243,62 @@ public class ActivityMain extends AppCompatActivity {
                 null
         );
 
-        if (cursor != null && cursor.moveToFirst()) {
-            int nombreIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_NOMBRE);
-            int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int nombreIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_NOMBRE);
+                int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
+                int typeIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_TYPE);
+                //int fotoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_FOTO);
 
-            String nombreFromDB = cursor.getString(nombreIndex);
-            String correoFromDB = cursor.getString(correoIndex);
+                if (correoIndex != -1) {
+                    String nombre = cursor.getString(nombreIndex);
+                    String correo = cursor.getString(correoIndex);
+                    String type = cursor.getString(typeIndex);
+                    //String foto = cursor.getString(fotoIndex);
 
-            lblNameUser.setText(nombreFromDB);
-            lblEmailUser.setText(correoFromDB);
-
+                    users.add(new ClassUser(null, nombre, correo, type));
+                } else {
+                    Toast.makeText(this, "Error al extraer de SQLite", Toast.LENGTH_SHORT).show();
+                }
+            }
             cursor.close();
+        }
+        if (!users.isEmpty()) {
+            ClassUser usuario = users.get(0);
+
+            lblNameUser.setText(usuario.getNombre());
+            lblEmailUser.setText(usuario.getEmail());
+            lblTypeAcc.setText(usuario.getTipoCuenta());
+
+            Bitmap imagenBitmap = BitmapFactory.decodeFile(urlFotoUser);
+            imgFotoUser.setImageBitmap(imagenBitmap);
+            Log.d("aaaaaaaaaaaa", "aaaaaaaaaaaaa: " + urlFotoUser);
         }
     }
 
-    public void insertDataToFirestoreUser(String userName, String userEmail, String userType) {
+    private void showFotoUser(String urlFotoUser, String userEmail) {
+        Log.d("ActivityMain", "Dato: " + urlFotoUser);
+        Log.d("ActivityMain", "Dato: " + userEmail);
+
+        ContentValues values = new ContentValues();
+        values.put(DBSqlite.TableUser.COLUMN_FOTO, urlFotoUser);
+
+        String selection = DBSqlite.TableUser.COLUMN_CORREO + " LIKE ?";
+        String[] selectionArgs = {userEmail};
+
+        int count = dbWrite.update(
+                DBSqlite.TableUser.TABLE_USER,
+                values,
+                selection,
+                selectionArgs);
+    }
+
+    public void insertDataToFirestoreUser(String userName, String userEmail, String userType, String urlFotoUser) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("cuenta", userType);
         userData.put("nombre", userName);
         userData.put("correo", userEmail);
+        //userData.put("foto", urlFotoUser);
 
         databaseFirebase.collection(userEmail).document("tableUser")
                 .set(userData, SetOptions.merge())
@@ -245,6 +315,28 @@ public class ActivityMain extends AppCompatActivity {
                     }
                 });
     }
+
+    public void insertFotoUser(String userEmail, String urlFotoUser) {
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("correo", userEmail);
+        userData.put("foto", urlFotoUser);
+
+        databaseFirebase.collection(userEmail).document("tableUser")
+                .set(userData, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ActivityMain.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ActivityMain.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void signOut() {
         gsc.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

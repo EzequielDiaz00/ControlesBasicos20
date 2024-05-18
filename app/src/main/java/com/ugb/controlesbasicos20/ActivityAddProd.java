@@ -137,7 +137,6 @@ public class ActivityAddProd extends AppCompatActivity {
                         insertDataToFirestoreProd(userEmail, codigo, nombre, marca, descripcion, precio, foto);
                     } catch (Exception e) {
                         Toast.makeText(ActivityAddProd.this, "Error al guardar el producto en Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        Log.d("AddProd", "Error" + e.getMessage());
                     }
 
                 } catch (Exception ex) {

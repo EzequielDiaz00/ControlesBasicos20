@@ -26,14 +26,20 @@
                     android:id="@+id/tabInicio"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/ivFotoUser"
-                        android:layout_margin="15dp"
+                    <androidx.cardview.widget.CardView
                         android:layout_width="100dp"
-                        android:layout_height="100dp"/>
+                        android:layout_height="100dp"
+                        android:layout_margin="10dp">
+
+                        <ImageView
+                            android:id="@+id/imgFotoUser"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp" />
+                    </androidx.cardview.widget.CardView>
+
 
                     <Button
                         android:id="@+id/btnFotoUser"
@@ -59,6 +65,14 @@
                         android:hint="Email"
                         android:textSize="20dp" />
 
+                    <TextView
+                        android:id="@+id/lblTypeAcc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="15dp"
+                        android:hint="Tipo"
+                        android:textSize="20dp" />
+
                     <Button
                         android:id="@+id/btnCerrarSesion"
                         android:layout_width="wrap_content"
@@ -72,8 +86,8 @@
                     android:id="@+id/tabInventario"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
                     <Button
                         android:id="@+id/btnVistaProductos"
@@ -81,7 +95,7 @@
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:text="Abrir inventario"
-                        android:textSize="25dp"/>
+                        android:textSize="25dp" />
 
                 </LinearLayout>
 
@@ -89,8 +103,8 @@
                     android:id="@+id/tabFinanzas"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
                 </LinearLayout>
             </FrameLayout>

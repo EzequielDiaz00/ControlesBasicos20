@@ -13,6 +13,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String TABLE_USER = "Users";
         public static final String COLUMN_NOMBRE = "Nombre";
         public static final String COLUMN_CORREO = "Correo";
+        public static final String COLUMN_TYPE = "Tipo";
         public static final String COLUMN_FOTO = "Foto";
     }
 
@@ -31,6 +32,7 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableUser._ID + " INTEGER PRIMARY KEY," +
                     TableUser.COLUMN_NOMBRE + " TEXT," +
                     TableUser.COLUMN_CORREO + " TEXT," +
+                    TableUser.COLUMN_TYPE + " TEXT," +
                     TableUser.COLUMN_FOTO + " TEXT)";
 
     private static final String SQL_CREATE_TABLE_PROD =
