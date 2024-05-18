@@ -78,7 +78,6 @@ public class ActivityProductos extends AppCompatActivity {
                     int marcaIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_MARCA);
                     int precioIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_PRECIO);
                     int fotoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_FOTO);
-                    Log.d("ActivityProd", "Foto basedata: " + fotoIndex);
 
                     if (codigoIndex != -1 && nombreIndex != -1 && precioIndex != -1) {
                         String codigo = cursor.getString(codigoIndex);
@@ -89,7 +88,7 @@ public class ActivityProductos extends AppCompatActivity {
 
                         productos.add(new ClassProductos(codigo, nombre, marca, null, precio, foto));
                     } else {
-                        Toast.makeText(this, "Error al extraer datos de la base de datos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Error al extraer de SQLite", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -105,9 +104,9 @@ public class ActivityProductos extends AppCompatActivity {
         listProd.setAdapter(adapter);
 
         if (productos.isEmpty()) {
-            Toast.makeText(this, "No se encontraron productos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Aún no hay productos. ¡Agrega uno!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Datos extraídos correctamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();
         }
     }
 

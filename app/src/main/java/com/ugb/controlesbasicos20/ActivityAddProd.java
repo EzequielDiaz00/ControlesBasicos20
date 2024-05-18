@@ -15,20 +15,31 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivityAddProd extends AppCompatActivity {
 
     EditText txtCod, txtNom, txtMar, txtDesc, txtPrec;
-    ImageButton imgProd;
+    ImageView imgProd;
     ClassFoto classFoto;
     Button btnGuardarProd;
+    ActivityMain activityMain;
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
+    FirebaseFirestore databaseFirebase;
 
     private static final int REQUEST_CAMERA_PERMISSION = 100;
 
@@ -52,7 +63,8 @@ public class ActivityAddProd extends AppCompatActivity {
         }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         try {
             if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
@@ -75,6 +87,9 @@ public class ActivityAddProd extends AppCompatActivity {
 
         classFoto = new ClassFoto(ActivityAddProd.this);
 
+        activityMain = new ActivityMain();
+        String userEmail = activityMain.userEmailLogin;
+
         txtCod = findViewById(R.id.txtCod);
         txtNom = findViewById(R.id.txtNom);
         txtMar = findViewById(R.id.txtMar);
@@ -85,6 +100,7 @@ public class ActivityAddProd extends AppCompatActivity {
 
         dbSqlite = new DBSqlite(this);
         dbWrite = dbSqlite.getWritableDatabase();
+        databaseFirebase = FirebaseFirestore.getInstance();
 
         imgProd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,9 +131,17 @@ public class ActivityAddProd extends AppCompatActivity {
 
                     long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
 
-                    Toast.makeText(ActivityAddProd.this, "Datos Agregados correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityAddProd.this, "Producto agregado a SQLite", Toast.LENGTH_SHORT).show();
+
+                    try {
+                        insertDataToFirestoreProd(userEmail, codigo, nombre, marca, descripcion, precio, foto);
+                    } catch (Exception e) {
+                        Toast.makeText(ActivityAddProd.this, "Error al guardar el producto en Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("AddProd", "Error" + e.getMessage());
+                    }
+
                 } catch (Exception ex) {
-                    Toast.makeText(ActivityAddProd.this, "Error al agregar el producto: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivityAddProd.this, "Error al agregar el producto en SQLite: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
                 Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
@@ -125,5 +149,30 @@ public class ActivityAddProd extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    public void insertDataToFirestoreProd(String userEmail, String codigo, String nombre, String marca, String descripcion, String precio, String foto) {
+        Map<String, Object> prodData = new HashMap<>();
+        prodData.put("codigo", codigo);
+        prodData.put("nombre", nombre);
+        prodData.put("marca", marca);
+        prodData.put("descripcion", descripcion);
+        prodData.put("precio", precio);
+        prodData.put("foto", foto);
+
+        databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre)
+                .set(prodData, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ActivityAddProd.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

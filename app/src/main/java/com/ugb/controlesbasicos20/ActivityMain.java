@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TabHost;
@@ -38,7 +37,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ActivityMain extends AppCompatActivity {
-
     TabHost tbhMain;
     Button btnCerrarSesion, btnFotoUser, btnAbrirProductos;
     TextView lblNameUser, lblEmailUser;
@@ -47,6 +45,7 @@ public class ActivityMain extends AppCompatActivity {
     FirebaseUser userEmailAuth;
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
+    String userType;
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
     SQLiteDatabase dbRead;
@@ -54,6 +53,7 @@ public class ActivityMain extends AppCompatActivity {
     FirebaseStorage storageFirebase;
     StorageReference storageRef;
     private static final int REQUEST_CAMERA_PERMISSION = 100;
+    public static String userEmailLogin;
 
     private void checkCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -146,12 +146,13 @@ public class ActivityMain extends AppCompatActivity {
         dbWrite = dbSqlite.getWritableDatabase();
         dbRead = dbSqlite.getReadableDatabase();
     }
-
     private void displayUserData(String userNameCorreo) {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
+            userType = "Google";
             String userNameGoogle = acct.getDisplayName();
             String userEmailGoogle = acct.getEmail();
+            userEmailLogin = userEmailGoogle;
 
             //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////////
             /*lblNameUser.setText(userNameGoogle);
@@ -162,7 +163,7 @@ public class ActivityMain extends AppCompatActivity {
             values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailGoogle);
             long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-            insertDataToFirestore(userNameGoogle, userEmailGoogle);
+            insertDataToFirestoreUser(userNameGoogle, userEmailGoogle, userType);
             showDataFromDatabase(userEmailGoogle);
         } else {
             if (userEmailAuth == null) {
@@ -170,18 +171,21 @@ public class ActivityMain extends AppCompatActivity {
                 startActivity(intent);
                 finish();
             } else {
+
                 //MOSTRAR DATOS DE USUARIOS EN LABELS///////////////////////////////////////////////
                 /*lblNameUser.setText(userNameCorreo);
                 lblEmailUser.setText(userEmailAuth.getEmail());*/
 
+                userType = "Email";
                 String userEmailCorreo = userEmailAuth.getEmail().toString();
+                userEmailLogin = userEmailCorreo;
 
                 ContentValues values = new ContentValues();
                 values.put(DBSqlite.TableUser.COLUMN_NOMBRE, userNameCorreo);
                 values.put(DBSqlite.TableUser.COLUMN_CORREO, userEmailCorreo);
                 long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-                insertDataToFirestore(userNameCorreo, userEmailCorreo);
+                insertDataToFirestoreUser(userNameCorreo, userEmailCorreo, userType);
                 showDataFromDatabase(userEmailCorreo);
             }
         }
@@ -217,17 +221,16 @@ public class ActivityMain extends AppCompatActivity {
             lblEmailUser.setText(correoFromDB);
 
             cursor.close();
-        } else {
-            // No hay datos en la base de datos para el usuario con el correo electrónico proporcionado
         }
     }
 
-    public void insertDataToFirestore(String userName, String userEmail) {
+    public void insertDataToFirestoreUser(String userName, String userEmail, String userType) {
         Map<String, Object> userData = new HashMap<>();
+        userData.put("cuenta", userType);
         userData.put("nombre", userName);
         userData.put("correo", userEmail);
 
-        databaseFirebase.collection("users").document(userEmail)
+        databaseFirebase.collection(userEmail).document("tableUser")
                 .set(userData, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -242,7 +245,6 @@ public class ActivityMain extends AppCompatActivity {
                     }
                 });
     }
-
     private void signOut() {
         gsc.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
