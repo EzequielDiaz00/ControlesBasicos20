@@ -190,7 +190,7 @@ public class ActivityLogin extends AppCompatActivity {
         String foto = null;
         String nombre = userNameAcc;
         String email = userEmailAcc;
-        String type = "Email";
+        String type = "Google";
 
         try {
             ContentValues values = new ContentValues();

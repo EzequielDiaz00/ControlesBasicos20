@@ -15,54 +15,59 @@
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
-        android:scaleType="fitCenter"
-        android:src="@android:drawable/ic_menu_camera" />
+        android:background="@drawable/ic_manage360_cam1"
+        android:scaleType="centerCrop" />
 
     <EditText
         android:id="@+id/txtCod"
-        android:hint="Codigo"
-        android:layout_below="@id/btnImgProd"
-        android:inputType="number"
-        android:layout_marginTop="40dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnImgProd"
+        android:layout_marginTop="40dp"
+        android:hint="Codigo"
+        android:inputType="number" />
+
     <EditText
         android:id="@+id/txtNom"
-        android:hint="Nombre"
-        android:inputType="textMultiLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txtCod"
         android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:hint="Nombre"
+        android:inputType="textMultiLine" />
+
     <EditText
         android:id="@+id/txtMar"
-        android:hint="Marca"
-        android:inputType="textMultiLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txtNom"
         android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:hint="Marca"
+        android:inputType="textMultiLine" />
+
     <EditText
         android:id="@+id/txtDesc"
-        android:hint="Descripcion"
-        android:inputType="textMultiLine"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txtMar"
         android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:hint="Descripcion"
+        android:inputType="textMultiLine" />
+
     <EditText
         android:id="@+id/txtPrec"
-        android:hint="Precio"
-        android:inputType="numberDecimal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txtDesc"
         android:layout_marginTop="40dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:hint="Precio"
+        android:inputType="numberDecimal" />
+
     <Button
         android:id="@+id/btnGuardarProd"
-        android:text="GUARDAR PRODUCTO"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txtPrec"
         android:layout_marginTop="40dp"
-        android:layout_height="wrap_content"/>
+        android:text="GUARDAR PRODUCTO" />
 </RelativeLayout>

@@ -19,6 +19,7 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     public static class TableProd implements BaseColumns {
         public static final String TABLE_PROD = "Productos";
+        public static final String COLUMN_USER = "User";
         public static final String COLUMN_CODIGO = "Codigo";
         public static final String COLUMN_NOMBRE = "Nombre";
         public static final String COLUMN_MARCA = "Marca";
@@ -38,6 +39,7 @@ public class DBSqlite extends SQLiteOpenHelper {
     private static final String SQL_CREATE_TABLE_PROD =
             "CREATE TABLE " + TableProd.TABLE_PROD + " (" +
                     TableProd._ID + " INTEGER PRIMARY KEY," +
+                    TableProd.COLUMN_USER + " TEXT," +
                     TableProd.COLUMN_CODIGO + " TEXT," +
                     TableProd.COLUMN_NOMBRE + " TEXT," +
                     TableProd.COLUMN_MARCA + " TEXT," +

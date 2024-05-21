@@ -47,7 +47,6 @@ public class ActivityMain extends AppCompatActivity {
     FirebaseStorage storageFirebase;
     StorageReference storageRef;
     public static String userEmailLogin;
-    private static boolean confirmNet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +94,6 @@ public class ActivityMain extends AppCompatActivity {
 
         classVerifyNet = new ClassVerifyNet(ActivityMain.this);
         classVerifyNet.isOnlineNet();
-        confirmNet = classVerifyNet.verifyNet;
 
         btnAbrirProductos = findViewById(R.id.btnVistaProductos);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
@@ -111,23 +109,22 @@ public class ActivityMain extends AppCompatActivity {
         storageFirebase = FirebaseStorage.getInstance();
         storageRef = storageFirebase.getReference();
     }
-    private void userLogin (){
+
+    private void userLogin() {
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null){
+        if (acct != null) {
             String userEmailGoogle = acct.getEmail();
             userEmailLogin = userEmailGoogle;
             showDataSqlite(userEmailGoogle);
-        }
-        else {
+        } else {
             if (userEmailAuth == null) {
                 Intent intent = new Intent(getApplicationContext(), ActivityLogin.class);
                 startActivity(intent);
                 finish();
-            }
-            else {
-            String userEmailCorreo = userEmailAuth.getEmail();
-            userEmailLogin = userEmailCorreo;
-            showDataSqlite(userEmailCorreo);
+            } else {
+                String userEmailCorreo = userEmailAuth.getEmail();
+                userEmailLogin = userEmailCorreo;
+                showDataSqlite(userEmailCorreo);
             }
         }
     }
@@ -138,7 +135,6 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void showDataSqlite(String userEmail) {
-        Toast.makeText(this, "Valor Email: " + userEmail, Toast.LENGTH_SHORT).show();
         List<ClassUser> users = new ArrayList<>();
 
         String[] projection = {

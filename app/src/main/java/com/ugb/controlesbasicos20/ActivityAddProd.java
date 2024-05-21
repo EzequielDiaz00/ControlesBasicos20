@@ -40,7 +40,6 @@ public class ActivityAddProd extends AppCompatActivity {
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
     FirebaseFirestore databaseFirebase;
-
     private static final int REQUEST_CAMERA_PERMISSION = 100;
 
     private void checkCameraPermission() {
@@ -113,6 +112,7 @@ public class ActivityAddProd extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                String user = userEmail;
                 String codigo = txtCod.getText().toString();
                 String nombre = txtNom.getText().toString();
                 String marca = txtMar.getText().toString();
@@ -122,6 +122,7 @@ public class ActivityAddProd extends AppCompatActivity {
 
                 try {
                     ContentValues values = new ContentValues();
+                    values.put(DBSqlite.TableProd.COLUMN_USER, user);
                     values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
                     values.put(DBSqlite.TableProd.COLUMN_NOMBRE, nombre);
                     values.put(DBSqlite.TableProd.COLUMN_MARCA, marca);
@@ -152,6 +153,7 @@ public class ActivityAddProd extends AppCompatActivity {
 
     public void insertDataToFirestoreProd(String userEmail, String codigo, String nombre, String marca, String descripcion, String precio, String foto) {
         Map<String, Object> prodData = new HashMap<>();
+        prodData.put("user", userEmail);
         prodData.put("codigo", codigo);
         prodData.put("nombre", nombre);
         prodData.put("marca", marca);

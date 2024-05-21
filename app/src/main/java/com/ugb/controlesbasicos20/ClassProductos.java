@@ -1,6 +1,7 @@
 package com.ugb.controlesbasicos20;
 
 public class ClassProductos {
+    private String user;
     private String codigo;
     private String nombre;
     private String marca;
@@ -8,13 +9,18 @@ public class ClassProductos {
     private Double precio;
     private String foto;
 
-    public ClassProductos(String codigo, String nombre, String marca, String descripcion, Double precio, String foto) {
+    public ClassProductos(String user, String codigo, String nombre, String marca, String descripcion, Double precio, String foto) {
+        this.user = user;
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
         this.descripcion = descripcion;
         this.precio = precio;
         this.foto = foto;
+    }
+
+    public String getUser() {
+        return user;
     }
 
     public String getCodigo() {
@@ -37,5 +43,7 @@ public class ClassProductos {
         return precio;
     }
 
-    public String getFoto() {return foto;}
+    public String getFoto() {
+        return foto;
+    }
 }
