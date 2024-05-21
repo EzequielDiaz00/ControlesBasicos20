@@ -3,7 +3,9 @@ package com.ugb.controlesbasicos20;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -18,10 +20,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivityLogin extends AppCompatActivity {
 
@@ -30,7 +39,11 @@ public class ActivityLogin extends AppCompatActivity {
     Button btnGoogle;
     EditText txtEmail;
     EditText txtPassword;
+    DBSqlite dbSqlite;
+    SQLiteDatabase dbWrite;
+    SQLiteDatabase dbRead;
     FirebaseAuth mAuth;
+    FirebaseFirestore databaseFirebase;
     ProgressBar barProgress;
     GoogleSignInOptions gso;
     GoogleSignInClient gsc;
@@ -51,19 +64,8 @@ public class ActivityLogin extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        txtEmail = findViewById(R.id.txtCorreo);
-        txtPassword = findViewById(R.id.txtPassword);
-        btnRegister = findViewById(R.id.btnRegister);
-        btnLogin = findViewById(R.id.btnLogin);
-        btnGoogle = findViewById(R.id.btnSiginGoogle);
-        barProgress = findViewById(R.id.barProgress);
-
-        mAuth = FirebaseAuth.getInstance();
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id)) // Add this line to request an ID token.
-                .requestEmail()
-                .build();
-        gsc = GoogleSignIn.getClient(this, gso);
+        cargarGoogleSignIn();
+        cargarObjetos();
 
         GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
         if (acct != null) {
@@ -84,9 +86,8 @@ public class ActivityLogin extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email, password;
-                email = txtEmail.getText().toString();
-                password = txtPassword.getText().toString();
+                String email = txtEmail.getText().toString();
+                String password = txtPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(ActivityLogin.this, "Ingrese su dirección de correo electrónico", Toast.LENGTH_SHORT).show();
@@ -105,13 +106,11 @@ public class ActivityLogin extends AppCompatActivity {
                                 barProgress.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
                                     Toast.makeText(getApplicationContext(), "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
-
                                     Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
                                     startActivity(intent);
                                     finish();
                                 } else {
-                                    Toast.makeText(ActivityLogin.this, "Hubo un error al iniciar sesión",
-                                            Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ActivityLogin.this, "Hubo un error al iniciar sesión", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -121,15 +120,39 @@ public class ActivityLogin extends AppCompatActivity {
         btnGoogle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SignIn();
+                signInGoogle();
             }
         });
     }
 
-    void SignIn() {
-        Intent signinIntent = gsc.getSignInIntent();
-        startActivityForResult(signinIntent, 1000);
+    private void cargarObjetos() {
+        txtEmail = findViewById(R.id.txtCorreo);
+        txtPassword = findViewById(R.id.txtPassword);
 
+        btnRegister = findViewById(R.id.btnRegister);
+        btnLogin = findViewById(R.id.btnLogin);
+        btnGoogle = findViewById(R.id.btnSiginGoogle);
+
+        barProgress = findViewById(R.id.barProgress);
+
+        mAuth = FirebaseAuth.getInstance();
+
+        dbSqlite = new DBSqlite(this);
+        dbWrite = dbSqlite.getWritableDatabase();
+        dbRead = dbSqlite.getReadableDatabase();
+    }
+
+    private void cargarGoogleSignIn() {
+        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        gsc = GoogleSignIn.getClient(this, gso);
+    }
+
+    void signInGoogle() {
+        Intent signInIntent = gsc.getSignInIntent();
+        startActivityForResult(signInIntent, 1000);
     }
 
     @Override
@@ -140,14 +163,75 @@ public class ActivityLogin extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
 
             try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
-                startActivity(intent);
-                finish();
+                task.getResult(ApiException.class);
+                GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+
+                if (acct != null) {
+                    String userNameGoogle = acct.getDisplayName();
+                    String userEmailGoogle = acct.getEmail();
+
+                    insertDataSqlite(userEmailGoogle, userNameGoogle);
+                    insertDataFirebase(userEmailGoogle, userNameGoogle);
+
+                    Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(this, "No se pudo obtener la cuenta de Google", Toast.LENGTH_SHORT).show();
+                }
             } catch (ApiException e) {
                 Toast.makeText(this, "Error al iniciar sesión con Google: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
+    }
 
+    private void insertDataSqlite(String userEmailAcc, String userNameAcc) {
+
+        String foto = null;
+        String nombre = userNameAcc;
+        String email = userEmailAcc;
+        String type = "Email";
+
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DBSqlite.TableUser.COLUMN_FOTO, foto);
+            values.put(DBSqlite.TableUser.COLUMN_NOMBRE, nombre);
+            values.put(DBSqlite.TableUser.COLUMN_CORREO, email);
+            values.put(DBSqlite.TableUser.COLUMN_TYPE, type);
+
+            long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
+
+            Toast.makeText(this, "Datos agregados correctamente a SQLite", Toast.LENGTH_SHORT).show();
+        } catch (Exception ex) {
+            Toast.makeText(this, "No se pudo ingresar datos a la base de datos: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void insertDataFirebase(String email, String nombre) {
+        databaseFirebase = FirebaseFirestore.getInstance();
+        String foto = null;
+        String tipo = "Google";
+
+        Map<String, Object> userData = new HashMap<>();
+
+        userData.put("foto", foto);
+        userData.put("nombre", nombre);
+        userData.put("email", email);
+        userData.put("tipoCuenta", tipo);
+
+        databaseFirebase.collection(email).document("tableUser")
+                .set(userData, SetOptions.merge())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Toast.makeText(ActivityLogin.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(ActivityLogin.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }
