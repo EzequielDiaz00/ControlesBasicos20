@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -32,7 +33,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,6 +52,8 @@ public class ActivityRegister extends AppCompatActivity {
     FirebaseAuth mAuth;
     FirebaseFirestore databaseFirebase;
     FirebaseUser userEmailAcc;
+    FirebaseStorage storageUser;
+    StorageReference storageUserRef;
     ProgressBar barProgress;
     String fotoUser;
     DBSqlite dbSqlite;
@@ -170,8 +177,9 @@ public class ActivityRegister extends AppCompatActivity {
                             try {
                                 userEmailAcc = mAuth.getCurrentUser();
                                 String type = "Email";
-                                insertDataSqlite(userEmailAcc.getEmail().toString());
-                                insertDataFirebase(fotoUser, txtName.getText().toString(), userEmailAcc.getEmail().toString(), type);
+                                insertDataToSqlite(userEmailAcc.getEmail());
+                                insertDataToFirebase(fotoUser, txtName.getText().toString(), userEmailAcc.getEmail(), type);
+                                insertDataToStorage();
                                 Toast.makeText(ActivityRegister.this, "¡Usuario creado exitosamente!", Toast.LENGTH_SHORT).show();
                             } catch (Exception ex) {
                                 Toast.makeText(ActivityRegister.this, "Error al registrar el usuario: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
@@ -203,6 +211,9 @@ public class ActivityRegister extends AppCompatActivity {
         btnFotoUser = findViewById(R.id.btnFotoUser);
         barProgress = findViewById(R.id.barProgress);
 
+        storageUser = FirebaseStorage.getInstance();
+        storageUserRef = storageUser.getReference();
+
         mAuth = FirebaseAuth.getInstance();
         databaseFirebase = FirebaseFirestore.getInstance();
 
@@ -212,8 +223,8 @@ public class ActivityRegister extends AppCompatActivity {
         dbRead = dbSqlite.getReadableDatabase();
     }
 
-    private void insertDataSqlite(String userEmailAcc) {
-        if (fotoUser == null){
+    private void insertDataToSqlite(String userEmailAcc) {
+        if (fotoUser == null) {
             fotoUser = null;
         }
 
@@ -237,7 +248,7 @@ public class ActivityRegister extends AppCompatActivity {
         }
     }
 
-    public void insertDataFirebase(String foto, String nombre, String email, String tipo) {
+    private void insertDataToFirebase(String foto, String nombre, String email, String tipo) {
         databaseFirebase = FirebaseFirestore.getInstance();
 
         Map<String, Object> userData = new HashMap<>();
@@ -260,5 +271,24 @@ public class ActivityRegister extends AppCompatActivity {
                         Toast.makeText(ActivityRegister.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    private void insertDataToStorage() {
+        Uri file = Uri.fromFile(new File(fotoUser));
+        StorageReference userRef = storageUserRef.child(userEmailAcc.getEmail().toString());
+        StorageReference userFotosRef = userRef.child("fotosUser/" + file.getLastPathSegment());
+        UploadTask uploadTask = userFotosRef.putFile(file);
+
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(ActivityRegister.this, "DataStorage NO ejecutado: " + userRef, Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(ActivityRegister.this, "DataStorage ejecutado correctamente: " + userRef, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

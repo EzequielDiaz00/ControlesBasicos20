@@ -14,8 +14,8 @@ import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +26,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +44,8 @@ public class ActivityAddProd extends AppCompatActivity {
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
     FirebaseFirestore databaseFirebase;
+    FirebaseStorage storageProd;
+    StorageReference storageProdRef;
     private static final int REQUEST_CAMERA_PERMISSION = 100;
 
     private void checkCameraPermission() {
@@ -85,21 +91,11 @@ public class ActivityAddProd extends AppCompatActivity {
         setContentView(R.layout.activity_add_prod);
 
         classFoto = new ClassFoto(ActivityAddProd.this);
-
         activityMain = new ActivityMain();
+
         String userEmail = activityMain.userEmailLogin;
 
-        txtCod = findViewById(R.id.txtCod);
-        txtNom = findViewById(R.id.txtNom);
-        txtMar = findViewById(R.id.txtMar);
-        txtDesc = findViewById(R.id.txtDesc);
-        txtPrec = findViewById(R.id.txtPrec);
-        btnGuardarProd = findViewById(R.id.btnGuardarProd);
-        imgProd = findViewById(R.id.btnImgProd);
-
-        dbSqlite = new DBSqlite(this);
-        dbWrite = dbSqlite.getWritableDatabase();
-        databaseFirebase = FirebaseFirestore.getInstance();
+        cargarObjetos();
 
         imgProd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,7 +108,6 @@ public class ActivityAddProd extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                String user = userEmail;
                 String codigo = txtCod.getText().toString();
                 String nombre = txtNom.getText().toString();
                 String marca = txtMar.getText().toString();
@@ -120,9 +115,11 @@ public class ActivityAddProd extends AppCompatActivity {
                 String precio = txtPrec.getText().toString();
                 String foto = classFoto.urlCompletaFoto;
 
+                insertDataToStorage(foto, userEmail);
+
                 try {
                     ContentValues values = new ContentValues();
-                    values.put(DBSqlite.TableProd.COLUMN_USER, user);
+                    values.put(DBSqlite.TableProd.COLUMN_USER, userEmail);
                     values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
                     values.put(DBSqlite.TableProd.COLUMN_NOMBRE, nombre);
                     values.put(DBSqlite.TableProd.COLUMN_MARCA, marca);
@@ -135,7 +132,7 @@ public class ActivityAddProd extends AppCompatActivity {
                     Toast.makeText(ActivityAddProd.this, "Producto agregado a SQLite", Toast.LENGTH_SHORT).show();
 
                     try {
-                        insertDataToFirestoreProd(userEmail, codigo, nombre, marca, descripcion, precio, foto);
+                        insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
                     } catch (Exception e) {
                         Toast.makeText(ActivityAddProd.this, "Error al guardar el producto en Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
@@ -151,7 +148,24 @@ public class ActivityAddProd extends AppCompatActivity {
         });
     }
 
-    public void insertDataToFirestoreProd(String userEmail, String codigo, String nombre, String marca, String descripcion, String precio, String foto) {
+    private void cargarObjetos() {
+        txtCod = findViewById(R.id.txtCod);
+        txtNom = findViewById(R.id.txtNom);
+        txtMar = findViewById(R.id.txtMar);
+        txtDesc = findViewById(R.id.txtDesc);
+        txtPrec = findViewById(R.id.txtPrec);
+        btnGuardarProd = findViewById(R.id.btnGuardarProd);
+        imgProd = findViewById(R.id.btnImgProd);
+
+        dbSqlite = new DBSqlite(this);
+        dbWrite = dbSqlite.getWritableDatabase();
+        databaseFirebase = FirebaseFirestore.getInstance();
+
+        storageProd = FirebaseStorage.getInstance();
+        storageProdRef = storageProd.getReference();
+    }
+
+    private void insertDataToFirebase(String userEmail, String codigo, String nombre, String marca, String descripcion, String precio, String foto) {
         Map<String, Object> prodData = new HashMap<>();
         prodData.put("user", userEmail);
         prodData.put("codigo", codigo);
@@ -161,21 +175,35 @@ public class ActivityAddProd extends AppCompatActivity {
         prodData.put("precio", precio);
         prodData.put("foto", foto);
 
-        databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre)
-                .set(prodData, SetOptions.merge())
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Toast.makeText(ActivityAddProd.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
-                    }
-                });
+        databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre).set(prodData, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(ActivityAddProd.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
+    private void insertDataToStorage(String foto, String userEmail) {
+        Uri file = Uri.fromFile(new File(foto));
+        StorageReference prodRef = storageProdRef.child(userEmail);
+        StorageReference prodFotosRef = prodRef.child("fotosProd/" + file.getLastPathSegment());
+        UploadTask uploadTask = prodFotosRef.putFile(file);
 
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(ActivityAddProd.this, "DataStorage NO ejecutado: " + prodRef, Toast.LENGTH_SHORT).show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast.makeText(ActivityAddProd.this, "DataStorage ejecutado correctamente: " + prodRef, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

@@ -54,21 +54,6 @@ public class ClassFoto {
         }
     }
 
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        try {
-            if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-                //Mostrar la foto///////////////////////////////////////////////////////////////////
-                /*Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
-                ivFotoUser.setImageBitmap(imagenBitmap);*/
-            } else {
-                Toast.makeText(activity, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(activity, "No se pudo tomar la foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-    }
-
     private File crearImagen() throws Exception {
         String fechaHoraMs = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String fileName = "imagen_" + fechaHoraMs + "_";
