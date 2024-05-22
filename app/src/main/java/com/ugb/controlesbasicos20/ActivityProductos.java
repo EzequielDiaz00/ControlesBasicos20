@@ -12,13 +12,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,14 +33,9 @@ public class ActivityProductos extends AppCompatActivity {
         activityMain = new ActivityMain();
         String userEmailLog = activityMain.userEmailLogin;
 
-        txtBuscarProd = findViewById(R.id.txtBuscarProd);
-        listProd = findViewById(R.id.listProd);
-        btnAddProd = findViewById(R.id.btnAddProd);
-
-        dbSqlite = new DBSqlite(this);
-        dbRead = dbSqlite.getReadableDatabase();
-
-        loadDataFromDatabase(userEmailLog);
+        cargarSqlite();
+        cargarObjetos();
+        loadDataFromSqlite(userEmailLog);
 
         btnAddProd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +46,18 @@ public class ActivityProductos extends AppCompatActivity {
         });
     }
 
-    private void loadDataFromDatabase(String userEmail) {
+    private void cargarObjetos() {
+        txtBuscarProd = findViewById(R.id.txtBuscarProd);
+        listProd = findViewById(R.id.listProd);
+        btnAddProd = findViewById(R.id.btnAddProd);
+    }
+
+    private void cargarSqlite() {
+        dbSqlite = new DBSqlite(this);
+        dbRead = dbSqlite.getReadableDatabase();
+    }
+
+    private void loadDataFromSqlite(String userEmail) {
         List<ClassProductos> productos = new ArrayList<>();
 
         String[] projection = {

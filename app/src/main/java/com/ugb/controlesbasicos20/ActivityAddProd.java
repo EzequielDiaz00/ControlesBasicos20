@@ -22,8 +22,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.storage.FirebaseStorage;
@@ -115,7 +118,7 @@ public class ActivityAddProd extends AppCompatActivity {
                 String precio = txtPrec.getText().toString();
                 String foto = classFoto.urlCompletaFoto;
 
-                insertDataToStorage(foto, userEmail);
+                insertDataToStorage(foto, userEmail, codigo, nombre);
 
                 try {
                     ContentValues values = new ContentValues();
@@ -188,7 +191,7 @@ public class ActivityAddProd extends AppCompatActivity {
         });
     }
 
-    private void insertDataToStorage(String foto, String userEmail) {
+    private void insertDataToStorage(String foto, String userEmail, String codigo, String nombre) {
         Uri file = Uri.fromFile(new File(foto));
         StorageReference prodRef = storageProdRef.child(userEmail);
         StorageReference prodFotosRef = prodRef.child("fotosProd/" + file.getLastPathSegment());
@@ -203,6 +206,48 @@ public class ActivityAddProd extends AppCompatActivity {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Toast.makeText(ActivityAddProd.this, "DataStorage ejecutado correctamente: " + prodRef, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        //Obtener enlace a la foto de Storage
+        uploadTask = prodFotosRef.putFile(file);
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return prodFotosRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Toast.makeText(ActivityAddProd.this, "Foto URL: " + downloadUri.toString(), Toast.LENGTH_SHORT).show();
+
+                    updateDataToFirebase(userEmail, codigo, nombre, downloadUri.toString());
+                } else {
+                    //Errores
+                }
+            }
+        });
+    }
+
+    private void updateDataToFirebase(String userEmail, String codigo, String nombre, String fotoUrl) {
+        Map<String, Object> prodData = new HashMap<>();
+        prodData.put("fotoUrl", fotoUrl);
+
+        databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre).set(prodData, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(ActivityAddProd.this, "Los datos se actualizaron correctamente en Firebase", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
             }
         });
     }
