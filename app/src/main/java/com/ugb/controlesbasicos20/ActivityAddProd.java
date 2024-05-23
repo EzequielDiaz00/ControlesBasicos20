@@ -16,6 +16,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -80,10 +81,10 @@ public class ActivityAddProd extends AppCompatActivity {
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                 imgProd.setImageBitmap(imagenBitmap);
             } else {
-                Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Se cancelo la captura de camara", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "No se pudo tomar la foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ActivityAddProd", "No se pudo tomar la foto: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -132,16 +133,16 @@ public class ActivityAddProd extends AppCompatActivity {
 
                     long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
 
-                    Toast.makeText(ActivityAddProd.this, "Producto agregado a SQLite", Toast.LENGTH_SHORT).show();
+                    //Exito//
 
                     try {
                         insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
                     } catch (Exception e) {
-                        Toast.makeText(ActivityAddProd.this, "Error al guardar el producto en Firebase: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.d("ActivityAddProd", "Error al insertar los datos en Firebase: " + e.getMessage());
                     }
 
                 } catch (Exception ex) {
-                    Toast.makeText(ActivityAddProd.this, "Error al agregar el producto en SQLite: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.d("ActivityAddProd", "Error al insertar los datos en SQLite: " + ex.getMessage());
                 }
 
                 Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
@@ -181,12 +182,12 @@ public class ActivityAddProd extends AppCompatActivity {
         databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre).set(prodData, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(ActivityAddProd.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                //Exito//
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                Log.d("ActivityAddProd_insertDataToFirebase", "Error al insertar los datos en Firebase: " + e.getMessage());
             }
         });
     }
@@ -200,12 +201,12 @@ public class ActivityAddProd extends AppCompatActivity {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(ActivityAddProd.this, "DataStorage NO ejecutado: " + prodRef, Toast.LENGTH_SHORT).show();
+                Log.d("ActivityAddProd_insertDataToStorage", "Error al insertar los datos en Storage: " + exception.getMessage());
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ActivityAddProd.this, "DataStorage ejecutado correctamente: " + prodRef, Toast.LENGTH_SHORT).show();
+                //Exito//
             }
         });
 
@@ -223,13 +224,14 @@ public class ActivityAddProd extends AppCompatActivity {
         }).addOnCompleteListener(new OnCompleteListener<Uri>() {
             @Override
             public void onComplete(@NonNull Task<Uri> task) {
-                if (task.isSuccessful()) {
-                    Uri downloadUri = task.getResult();
-                    Toast.makeText(ActivityAddProd.this, "Foto URL: " + downloadUri.toString(), Toast.LENGTH_SHORT).show();
+                try {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
 
-                    updateDataToFirebase(userEmail, codigo, nombre, downloadUri.toString());
-                } else {
-                    //Errores
+                        updateDataToFirebase(userEmail, codigo, nombre, downloadUri.toString());
+                    }
+                } catch (Exception ex) {
+                    Log.d("ActivityAddProd_insertDataToStorage", "Error al extraer URL de Storage: " + ex.getMessage());
                 }
             }
         });
@@ -242,12 +244,12 @@ public class ActivityAddProd extends AppCompatActivity {
         databaseFirebase.collection(userEmail).document("tableProductos").collection(codigo).document(nombre).set(prodData, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(ActivityAddProd.this, "Los datos se actualizaron correctamente en Firebase", Toast.LENGTH_SHORT).show();
+                //Exito
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ActivityAddProd.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                Log.d("ActivityAddProd_updateDataToFirebase", "Error al actualizar los datos en Firebase: " + e.getMessage());
             }
         });
     }

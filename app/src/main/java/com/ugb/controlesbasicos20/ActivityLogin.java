@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -104,14 +105,19 @@ public class ActivityLogin extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 barProgress.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(getApplicationContext(), "Sesion iniciada correctamente", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    Toast.makeText(ActivityLogin.this, "Hubo un error al iniciar sesión", Toast.LENGTH_SHORT).show();
+                                try {
+                                    if (task.isSuccessful()) {
+                                        //Exito//
+                                        Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Toast.makeText(ActivityLogin.this, "No se pudo iniciar sesion", Toast.LENGTH_SHORT).show();
+                                    }
+                                } catch (Exception ex){
+                                    Log.d("ActivityLogin", "Error al iniciar sesion con Email: " + ex.getMessage());
                                 }
+
                             }
                         });
             }
@@ -173,6 +179,8 @@ public class ActivityLogin extends AppCompatActivity {
                     insertDataSqlite(userEmailGoogle, userNameGoogle);
                     insertDataFirebase(userEmailGoogle, userNameGoogle);
 
+                    //Exito//
+
                     Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
                     startActivity(intent);
                     finish();
@@ -180,7 +188,7 @@ public class ActivityLogin extends AppCompatActivity {
                     Toast.makeText(this, "No se pudo obtener la cuenta de Google", Toast.LENGTH_SHORT).show();
                 }
             } catch (ApiException e) {
-                Toast.makeText(this, "Error al iniciar sesión con Google: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.d("ActivityLogin", "Error al iniciar sesion con Google: " + e.getMessage());
             }
         }
     }
@@ -201,9 +209,9 @@ public class ActivityLogin extends AppCompatActivity {
 
             long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-            Toast.makeText(this, "Datos agregados correctamente a SQLite", Toast.LENGTH_SHORT).show();
+            //Exito//
         } catch (Exception ex) {
-            Toast.makeText(this, "No se pudo ingresar datos a la base de datos: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ActivityLogin", "Error al insertar datos en SQLite: " + ex.getMessage());
         }
     }
 
@@ -224,13 +232,13 @@ public class ActivityLogin extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(ActivityLogin.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                        //Exito//
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ActivityLogin.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                        Log.d("ActivityLogin", "Error al insertar datos a Firebase: " + e.getMessage());
                     }
                 });
     }

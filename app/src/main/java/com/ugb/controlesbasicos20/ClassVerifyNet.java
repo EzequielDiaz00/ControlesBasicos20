@@ -1,6 +1,7 @@
 package com.ugb.controlesbasicos20;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Toast;
 
 public class ClassVerifyNet {
@@ -19,11 +20,10 @@ public class ClassVerifyNet {
             int val = p.waitFor();
             boolean reachable = (val == 0);
             verifyNet = reachable;
-            Toast.makeText(activity, "Valor conexion: " + verifyNet, Toast.LENGTH_SHORT).show();
             return reachable;
 
         } catch (Exception e) {
-            Toast.makeText(activity, "No hay conexion a internet: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ClassVerifyNet", "Error al verificar conexion a internet: " + e.getMessage());
             e.printStackTrace();
         }
         return false;

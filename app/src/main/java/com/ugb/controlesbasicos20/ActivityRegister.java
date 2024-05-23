@@ -17,6 +17,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -89,10 +91,10 @@ public class ActivityRegister extends AppCompatActivity {
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                 btnFotoUser.setImageBitmap(imagenBitmap);
             } else {
-                Toast.makeText(this, "No se pudo tomar la foto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Se cancelo la captura de camara", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "No se pudo tomar la foto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ActivityRegister", "No se pudo tomar la foto: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -179,10 +181,10 @@ public class ActivityRegister extends AppCompatActivity {
                                 String type = "Email";
                                 insertDataToSqlite(userEmailAcc.getEmail());
                                 insertDataToFirebase(fotoUser, txtName.getText().toString(), userEmailAcc.getEmail(), type);
-                                insertDataToStorage();
+                                insertDataToStorage(userEmailAcc.getEmail());
                                 Toast.makeText(ActivityRegister.this, "¡Usuario creado exitosamente!", Toast.LENGTH_SHORT).show();
                             } catch (Exception ex) {
-                                Toast.makeText(ActivityRegister.this, "Error al registrar el usuario: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.d("ActivityRegister", "No se pudo tomar la foto: " + ex.getMessage());
                             }
 
                             Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
@@ -190,7 +192,7 @@ public class ActivityRegister extends AppCompatActivity {
                             startActivity(intent);
                             finish();
                         } else {
-                            Toast.makeText(ActivityRegister.this, "Error al crear el usuario",
+                            Toast.makeText(ActivityRegister.this, "No se pudo crear el usuario. Intente otra vez",
                                     Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -242,9 +244,9 @@ public class ActivityRegister extends AppCompatActivity {
 
             long newRowId = dbWrite.insert(DBSqlite.TableUser.TABLE_USER, null, values);
 
-            Toast.makeText(this, "Datos agregados correctamente a SQLite", Toast.LENGTH_SHORT).show();
+            //Exito//
         } catch (Exception ex) {
-            Toast.makeText(this, "No se pudo ingresar datos a la base de datos: " + ex.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ActivityRegister", "Error al insertar los datos en SQLite: " + ex.getMessage());
         }
     }
 
@@ -262,18 +264,18 @@ public class ActivityRegister extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        Toast.makeText(ActivityRegister.this, "Los datos se agregaron correctamente a Firebase", Toast.LENGTH_SHORT).show();
+                        //Exito//
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ActivityRegister.this, "Error al agregar los datos a Firebase", Toast.LENGTH_SHORT).show();
+                        Log.d("ActivityRegister", "Error al insertar los datos en Firebase: " + e.getMessage());
                     }
                 });
     }
 
-    private void insertDataToStorage() {
+    private void insertDataToStorage(String userEmail) {
         Uri file = Uri.fromFile(new File(fotoUser));
         StorageReference userRef = storageUserRef.child(userEmailAcc.getEmail().toString());
         StorageReference userFotosRef = userRef.child("fotosUser/" + file.getLastPathSegment());
@@ -282,12 +284,55 @@ public class ActivityRegister extends AppCompatActivity {
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(ActivityRegister.this, "DataStorage NO ejecutado: " + userRef, Toast.LENGTH_SHORT).show();
+                Log.d("ActivityRegister", "Error al insertar los datos en FireStorage: " + exception.getMessage());
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast.makeText(ActivityRegister.this, "DataStorage ejecutado correctamente: " + userRef, Toast.LENGTH_SHORT).show();
+                //Exito//
+            }
+        });
+
+        //Obtener enlace a la foto de Storage
+        uploadTask = userFotosRef.putFile(file);
+
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+                return userFotosRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                try {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+
+                        updateDataToFirebase(userEmail, downloadUri.toString());
+                    }
+                } catch (Exception ex) {
+                    Log.d("ActivityRegister_insertDataToStorage", "Error al extraer URL de Storage: " + ex.getMessage());
+                }
+            }
+        });
+    }
+
+    private void updateDataToFirebase(String userEmail, String fotoUrl) {
+        Map<String, Object> prodData = new HashMap<>();
+        prodData.put("fotoUrl", fotoUrl);
+
+        databaseFirebase.collection(userEmail).document("tableUser").set(prodData, SetOptions.merge()).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                //Exito
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("ActivityRegister_updateDataToFirebase", "Error al actualizar los datos en Firebase: " + e.getMessage());
             }
         });
     }

@@ -34,18 +34,12 @@ public class AdapterProductos extends ArrayAdapter<ClassProductos> {
         ImageView imgProd = convertView.findViewById(R.id.imgProd);
 
         if (producto != null) {
-            Log.d("AdapterProductos", "Codigo: " + producto.getCodigo());
-            Log.d("AdapterProductos", "Nombre: " + producto.getNombre());
-            Log.d("AdapterProductos", "Marca: " + producto.getMarca());
-            Log.d("AdapterProductos", "Precio: " + producto.getPrecio());
-
             tvCodigo.setText(producto.getCodigo());
             tvNombre.setText(producto.getNombre());
             tvMarca.setText(producto.getMarca());
             tvPrecio.setText("$ " + producto.getPrecio());
 
             String urlCompletaFoto = producto.getFoto();
-            Log.d("AdapterProductos", "Foto: " + urlCompletaFoto);
 
             if (urlCompletaFoto != null && !urlCompletaFoto.isEmpty()) {
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);

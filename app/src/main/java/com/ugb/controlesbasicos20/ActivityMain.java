@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -181,7 +182,7 @@ public class ActivityMain extends AppCompatActivity {
                 Toast.makeText(this, "No se encontraron datos", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Error al extraer de SQLite: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ActivityMain", "Error al extraer de SQLite: " + e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();

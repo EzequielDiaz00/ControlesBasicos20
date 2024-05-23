@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -106,12 +107,12 @@ public class ActivityProductos extends AppCompatActivity {
 
                         productos.add(new ClassProductos(user, codigo, nombre, marca, descripcion, precio, foto));
                     } else {
-                        Toast.makeText(this, "Error al extraer de SQLite", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No se pudieron mostrar los productos", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(this, "Error al cargar los datos: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Log.d("ActivityProductos", "Error al extraer de SQLite: " + e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -124,7 +125,7 @@ public class ActivityProductos extends AppCompatActivity {
         if (productos.isEmpty()) {
             Toast.makeText(this, "Aún no hay productos. ¡Agrega uno!", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();
+            /*Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();*/
         }
     }
 

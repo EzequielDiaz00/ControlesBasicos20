@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -49,7 +50,7 @@ public class ClassFoto {
                 Toast.makeText(activity, "No se pudo iniciar la camara", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
-            Toast.makeText(activity, "No se pudo iniciar la camara: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("ClassFoto", "Error al iniciar la camara: " + e.getMessage());
             e.printStackTrace();
         }
     }
