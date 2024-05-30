@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnImgProd"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:hint="Codigo"
         android:inputType="number" />
 
@@ -32,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtCod"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:hint="Nombre"
         android:inputType="textMultiLine" />
 
@@ -41,7 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtNom"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:hint="Marca"
         android:inputType="textMultiLine" />
 
@@ -50,7 +50,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtMar"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:hint="Descripcion"
         android:inputType="textMultiLine" />
 
@@ -59,15 +59,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/txtDesc"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:hint="Precio"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/txtCost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/txtPrec"
+        android:layout_marginTop="30dp"
+        android:hint="Costo"
         android:inputType="numberDecimal" />
 
     <Button
         android:id="@+id/btnGuardarProd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txtPrec"
-        android:layout_marginTop="40dp"
+        android:layout_below="@id/txtCost"
+        android:layout_marginTop="30dp"
         android:text="GUARDAR PRODUCTO" />
 </RelativeLayout>

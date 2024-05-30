@@ -1,21 +1,25 @@
 package com.ugb.controlesbasicos20;
 
-public class ClassProductos {
+import java.io.Serializable;
+
+public class ClassProductos implements Serializable {
     private String user;
     private String codigo;
     private String nombre;
     private String marca;
     private String descripcion;
     private Double precio;
+    private Double costo;
     private String foto;
 
-    public ClassProductos(String user, String codigo, String nombre, String marca, String descripcion, Double precio, String foto) {
+    public ClassProductos(String user, String codigo, String nombre, String marca, String descripcion, Double precio, Double costo, String foto) {
         this.user = user;
         this.codigo = codigo;
         this.nombre = nombre;
         this.marca = marca;
         this.descripcion = descripcion;
         this.precio = precio;
+        this.costo = costo;
         this.foto = foto;
     }
 
@@ -41,6 +45,10 @@ public class ClassProductos {
 
     public Double getPrecio() {
         return precio;
+    }
+
+    public Double getCosto() {
+        return costo;
     }
 
     public String getFoto() {

@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class ActivityAddProd extends AppCompatActivity {
 
-    EditText txtCod, txtNom, txtMar, txtDesc, txtPrec;
+    EditText txtCod, txtNom, txtMar, txtDesc, txtPrec, txtCost;
     ImageView imgProd;
     ClassFoto classFoto;
     Button btnGuardarProd;
@@ -108,46 +108,128 @@ public class ActivityAddProd extends AppCompatActivity {
             }
         });
 
+        Intent intent = getIntent();
+        if (intent != null) {
+            if (intent.hasExtra("producto")) {
+                ClassProductos producto = (ClassProductos) intent.getSerializableExtra("producto");
+
+                if (producto != null) {
+                    txtCod.setText(producto.getCodigo());
+                    txtNom.setText(producto.getNombre());
+                    txtMar.setText(producto.getMarca());
+                    txtDesc.setText(producto.getDescripcion());
+                    txtPrec.setText(producto.getPrecio().toString());
+                    txtCost.setText(producto.getCosto().toString());
+
+                    String urlCompletaFoto = producto.getFoto();
+                    Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
+                    imgProd.setImageBitmap(imagenBitmap);
+                }
+            }
+        }
+
         btnGuardarProd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String codigo = txtCod.getText().toString();
-                String nombre = txtNom.getText().toString();
-                String marca = txtMar.getText().toString();
-                String descripcion = txtDesc.getText().toString();
-                String precio = txtPrec.getText().toString();
-                String foto = classFoto.urlCompletaFoto;
+                if (intent == null) {
+                    String codigo = txtCod.getText().toString();
+                    String nombre = txtNom.getText().toString();
+                    String marca = txtMar.getText().toString();
+                    String descripcion = txtDesc.getText().toString();
+                    String precio = txtPrec.getText().toString();
+                    String costo = txtCost.getText().toString();
+                    String foto = classFoto.urlCompletaFoto;
 
-                insertDataToStorage(foto, userEmail, codigo, nombre);
-
-                try {
-                    ContentValues values = new ContentValues();
-                    values.put(DBSqlite.TableProd.COLUMN_USER, userEmail);
-                    values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
-                    values.put(DBSqlite.TableProd.COLUMN_NOMBRE, nombre);
-                    values.put(DBSqlite.TableProd.COLUMN_MARCA, marca);
-                    values.put(DBSqlite.TableProd.COLUMN_DESCRIPCION, descripcion);
-                    values.put(DBSqlite.TableProd.COLUMN_PRECIO, precio);
-                    values.put(DBSqlite.TableProd.COLUMN_FOTO, foto);
-
-                    long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
-
-                    //Exito//
+                    insertDataToStorage(foto, userEmail, codigo, nombre);
 
                     try {
-                        insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
-                    } catch (Exception e) {
-                        Log.d("ActivityAddProd", "Error al insertar los datos en Firebase: " + e.getMessage());
+                        ContentValues values = new ContentValues();
+                        values.put(DBSqlite.TableProd.COLUMN_USER, userEmail);
+                        values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
+                        values.put(DBSqlite.TableProd.COLUMN_NOMBRE, nombre);
+                        values.put(DBSqlite.TableProd.COLUMN_MARCA, marca);
+                        values.put(DBSqlite.TableProd.COLUMN_DESCRIPCION, descripcion);
+                        values.put(DBSqlite.TableProd.COLUMN_PRECIO, precio);
+                        values.put(DBSqlite.TableProd.COLUMN_COSTO, costo);
+                        values.put(DBSqlite.TableProd.COLUMN_FOTO, foto);
+
+                        long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
+
+                        //Exito//
+
+                        try {
+                            insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
+                        } catch (Exception e) {
+                            Log.d("ActivityAddProd", "Error al insertar los datos en Firebase: " + e.getMessage());
+                        }
+
+                    } catch (Exception ex) {
+                        Log.d("ActivityAddProd", "Error al insertar los datos en SQLite: " + ex.getMessage());
                     }
 
-                } catch (Exception ex) {
-                    Log.d("ActivityAddProd", "Error al insertar los datos en SQLite: " + ex.getMessage());
-                }
+                    Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                    startActivity(intent);
+                    finish();
+                } else {
 
-                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
-                startActivity(intent);
-                finish();
+                    if (intent.hasExtra("producto")) {
+                        ClassProductos producto = (ClassProductos) intent.getSerializableExtra("producto");
+
+                        if (producto != null) {
+                            String urlCompletaFoto = producto.getFoto();
+                            Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
+                            imgProd.setImageBitmap(imagenBitmap);
+
+                            String codigo = txtCod.getText().toString();
+                            String nombre = txtNom.getText().toString();
+                            String marca = txtMar.getText().toString();
+                            String descripcion = txtDesc.getText().toString();
+                            String precio = txtPrec.getText().toString();
+                            String costo = txtCost.getText().toString();
+                            String foto = urlCompletaFoto;
+
+                            insertDataToStorage(foto, userEmail, codigo, nombre);
+
+                            try {
+                                ContentValues values = new ContentValues();
+                                values.put(DBSqlite.TableProd.COLUMN_USER, userEmail);
+                                values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
+                                values.put(DBSqlite.TableProd.COLUMN_NOMBRE, nombre);
+                                values.put(DBSqlite.TableProd.COLUMN_MARCA, marca);
+                                values.put(DBSqlite.TableProd.COLUMN_DESCRIPCION, descripcion);
+                                values.put(DBSqlite.TableProd.COLUMN_PRECIO, precio);
+                                values.put(DBSqlite.TableProd.COLUMN_COSTO, costo);
+                                values.put(DBSqlite.TableProd.COLUMN_FOTO, foto);
+
+                                String selection = DBSqlite.TableProd.COLUMN_CODIGO + " = ?";
+                                String[] selectionArgs = {codigo};
+
+                                int rowsUpdated = dbWrite.update(
+                                        DBSqlite.TableProd.TABLE_PROD,
+                                        values,
+                                        selection,
+                                        selectionArgs
+                                );
+
+                                //Exito//
+
+                                try {
+                                    insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
+                                } catch (Exception e) {
+                                    Log.d("ActivityAddProd", "Error al insertar los datos en Firebase: " + e.getMessage());
+                                }
+
+                            } catch (Exception ex) {
+                                Log.d("ActivityAddProd", "Error al insertar los datos en SQLite: " + ex.getMessage());
+                            }
+
+                            Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }
+                }
             }
         });
     }
@@ -158,6 +240,7 @@ public class ActivityAddProd extends AppCompatActivity {
         txtMar = findViewById(R.id.txtMar);
         txtDesc = findViewById(R.id.txtDesc);
         txtPrec = findViewById(R.id.txtPrec);
+        txtCost = findViewById(R.id.txtCost);
         btnGuardarProd = findViewById(R.id.btnGuardarProd);
         imgProd = findViewById(R.id.btnImgProd);
 
