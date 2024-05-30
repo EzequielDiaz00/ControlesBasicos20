@@ -1,24 +1,30 @@
 package com.ugb.controlesbasicos20;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ActivityShowProd extends AppCompatActivity {
 
     TextView lblCod, lblNom, lblMar, lblDes, lblPre, lblCos;
     Button btnModificar, btnEliminar;
     ImageView imgFotoProd;
+    DBSqlite dbSqlite;
+    SQLiteDatabase dbWrite;
+    FirebaseFirestore databaseFirebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,10 @@ public class ActivityShowProd extends AppCompatActivity {
         btnModificar = findViewById(R.id.btnModificar);
         btnEliminar = findViewById(R.id.btnEliminar);
         imgFotoProd = findViewById(R.id.imgProd);
+
+        dbSqlite = new DBSqlite(this);
+        dbWrite = dbSqlite.getWritableDatabase();
+        databaseFirebase = FirebaseFirestore.getInstance();
 
         ClassProductos producto = (ClassProductos) getIntent().getSerializableExtra("producto");
 
@@ -64,9 +74,57 @@ public class ActivityShowProd extends AppCompatActivity {
         btnEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mostrarDialogoConfirmacion();
             }
         });
 
+    }
+
+    private void mostrarDialogoConfirmacion() {
+        new AlertDialog.Builder(this)
+                .setTitle("Confirmar eliminación")
+                .setMessage("¿Estás seguro de que deseas eliminar este producto?")
+                .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        eliminarProducto();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void eliminarProducto(){
+        ClassProductos producto = (ClassProductos) getIntent().getSerializableExtra("producto");
+
+        if (producto != null) {
+            String selection = DBSqlite.TableProd.COLUMN_CODIGO + " = ?";
+            String[] selectionArgs = {producto.getCodigo()};
+
+            // Eliminar producto de SQLite
+            int deletedRows = dbWrite.delete(DBSqlite.TableProd.TABLE_PROD, selection, selectionArgs);
+
+            // Eliminar producto de Firebase
+            String userEmail = new ActivityMain().userEmailLogin;
+            databaseFirebase.collection(userEmail)
+                    .document("tableProductos")
+                    .collection(producto.getCodigo())
+                    .document(producto.getNombre())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        // Exito //
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error //
+                    });
+
+            if (deletedRows > 0) {
+                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                startActivity(intent);
+                finish();
+            } else {
+                // Error //
+            }
+        }
     }
 }
