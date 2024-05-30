@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -24,6 +25,7 @@ public class ActivityProductos extends AppCompatActivity {
     DBSqlite dbSqlite;
     SQLiteDatabase dbRead;
     AdapterProductos adapter;
+    List<ClassProductos> productos;  // Mueve la declaración aquí
     ActivityMain activityMain;
 
     @Override
@@ -45,6 +47,17 @@ public class ActivityProductos extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        listProd.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ClassProductos productoSeleccionado = productos.get(position);
+
+                Intent intent = new Intent(getApplicationContext(), ActivityShowProd.class);
+                intent.putExtra("producto", productoSeleccionado);
+                startActivity(intent);
+            }
+        });
     }
 
     private void cargarObjetos() {
@@ -59,7 +72,7 @@ public class ActivityProductos extends AppCompatActivity {
     }
 
     private void loadDataFromSqlite(String userEmail) {
-        List<ClassProductos> productos = new ArrayList<>();
+        productos = new ArrayList<>();  // Inicializa aquí
 
         String[] projection = {
                 DBSqlite.TableProd.COLUMN_USER,
@@ -68,6 +81,7 @@ public class ActivityProductos extends AppCompatActivity {
                 DBSqlite.TableProd.COLUMN_MARCA,
                 DBSqlite.TableProd.COLUMN_DESCRIPCION,
                 DBSqlite.TableProd.COLUMN_PRECIO,
+                DBSqlite.TableProd.COLUMN_COSTO,
                 DBSqlite.TableProd.COLUMN_FOTO
         };
 
@@ -94,6 +108,7 @@ public class ActivityProductos extends AppCompatActivity {
                     int marcaIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_MARCA);
                     int descripcionIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_DESCRIPCION);
                     int precioIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_PRECIO);
+                    int costoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_COSTO);
                     int fotoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_FOTO);
 
                     if (codigoIndex != -1 && nombreIndex != -1 && precioIndex != -1) {
@@ -103,9 +118,10 @@ public class ActivityProductos extends AppCompatActivity {
                         String marca = cursor.getString(marcaIndex);
                         String descripcion = cursor.getString(descripcionIndex);
                         Double precio = Double.valueOf(cursor.getString(precioIndex));
+                        Double costo = Double.valueOf(cursor.getString(costoIndex));
                         String foto = cursor.getString(fotoIndex);
 
-                        productos.add(new ClassProductos(user, codigo, nombre, marca, descripcion, precio, foto));
+                        productos.add(new ClassProductos(user, codigo, nombre, marca, descripcion, precio, costo, foto));
                     } else {
                         Toast.makeText(this, "No se pudieron mostrar los productos", Toast.LENGTH_SHORT).show();
                     }
@@ -128,6 +144,5 @@ public class ActivityProductos extends AppCompatActivity {
             /*Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();*/
         }
     }
-
-
 }
+
