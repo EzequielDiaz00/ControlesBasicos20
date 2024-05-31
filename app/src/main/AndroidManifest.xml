@@ -23,6 +23,15 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ActivityShowVent"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAddVent"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityVentas"
+            android:exported="false" />
+        <activity
             android:name=".ActivityShowProd"
             android:exported="false" />
         <activity

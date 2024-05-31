@@ -17,6 +17,13 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_FOTO = "Foto";
     }
 
+    public static class TableBalance implements BaseColumns {
+        public static final String TABLE_BALANCE = "Balance";
+        public static final String COLUMN_PROD = "Total_Prod";
+        public static final String COLUMN_COMP = "Total_Compra";
+        public static final String COLUMN_VENT = "Total_Venta";
+    }
+
     public static class TableProd implements BaseColumns {
         public static final String TABLE_PROD = "Productos";
         public static final String COLUMN_USER = "User";
@@ -26,18 +33,22 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_DESCRIPCION = "Descripcion";
         public static final String COLUMN_PRECIO = "Precio";
         public static final String COLUMN_COSTO = "Costo";
+        public static final String COLUMN_STOCK = "Stock";
         public static final String COLUMN_FOTO = "Foto";
     }
 
     public static class TableVent implements BaseColumns {
         public static final String TABLE_VENT = "Ventas";
+        public static final String COLUMN_USER = "Fecha";
         public static final String COLUMN_FECHA = "Fecha";
-        public static final String COLUMN_ID_PRODUCTO = "ID_Producto";
+        public static final String COLUMN_FOTO_PROD = "Foto_Producto";
+        public static final String COLUMN_ID_PROD = "ID_Producto";
+        public static final String COLUMN_NOMBRE_PROD = "Nombre_Producto";
+        public static final String COLUMN_MARCA_PROD = "Marca_Producto";
         public static final String COLUMN_CANTIDAD = "Cantidad";
         public static final String COLUMN_PRECIO_UNITARIO = "Precio_Unitario";
+        public static final String COLUMN_CLIENTE = "Cliente";
         public static final String COLUMN_TOTAL_VENTA = "Total_Venta";
-        public static final String COLUMN_ID_CLIENTE = "ID_Cliente";
-        public static final String COLUMN_METODO_PAGO = "Metodo_Pago";
     }
 
     private static final String SQL_CREATE_TABLE_USER =
@@ -47,6 +58,12 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableUser.COLUMN_CORREO + " TEXT," +
                     TableUser.COLUMN_TYPE + " TEXT," +
                     TableUser.COLUMN_FOTO + " TEXT)";
+    private static final String SQL_CREATE_TABLE_BALANCE =
+            "CREATE TABLE " + TableBalance.TABLE_BALANCE + " (" +
+                    TableBalance._ID + " INTEGER PRIMARY KEY," +
+                    TableBalance.COLUMN_PROD + " TEXT," +
+                    TableBalance.COLUMN_COMP + " TEXT," +
+                    TableBalance.COLUMN_VENT + " TEXT)";
 
     private static final String SQL_CREATE_TABLE_PROD =
             "CREATE TABLE " + TableProd.TABLE_PROD + " (" +
@@ -58,19 +75,23 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableProd.COLUMN_DESCRIPCION + " TEXT," +
                     TableProd.COLUMN_PRECIO + " TEXT," +
                     TableProd.COLUMN_COSTO + " TEXT," +
+                    TableProd.COLUMN_STOCK + " TEXT," +
                     TableProd.COLUMN_FOTO + " TEXT)";
 
     private static final String SQL_CREATE_TABLE_VENT =
             "CREATE TABLE " + TableVent.TABLE_VENT + " (" +
                     TableVent._ID + " INTEGER PRIMARY KEY," +
+                    TableVent.COLUMN_USER + " TEXT," +
                     TableVent.COLUMN_FECHA + " TEXT," +
-                    TableVent.COLUMN_ID_PRODUCTO + " INTEGER," +
+                    TableVent.COLUMN_FOTO_PROD + " INTEGER," +
+                    TableVent.COLUMN_ID_PROD + " INTEGER," +
+                    TableVent.COLUMN_NOMBRE_PROD + " INTEGER," +
+                    TableVent.COLUMN_MARCA_PROD + " INTEGER," +
                     TableVent.COLUMN_CANTIDAD + " INTEGER," +
                     TableVent.COLUMN_PRECIO_UNITARIO + " REAL," +
+                    TableVent.COLUMN_CLIENTE + " TEXT," +
                     TableVent.COLUMN_TOTAL_VENTA + " REAL," +
-                    TableVent.COLUMN_ID_CLIENTE + " INTEGER," +
-                    TableVent.COLUMN_METODO_PAGO + " TEXT," +
-                    "FOREIGN KEY(" + TableVent.COLUMN_ID_PRODUCTO + ") REFERENCES " + TableProd.TABLE_PROD + "(" + TableProd._ID + "))";
+                    "FOREIGN KEY(" + TableVent.COLUMN_ID_PROD + ") REFERENCES " + TableProd.TABLE_PROD + "(" + TableProd._ID + "))";
 
     private static final String SQL_DELETE_ENTRIES_USER =
             "DROP TABLE IF EXISTS " + TableUser.TABLE_USER;
@@ -78,6 +99,8 @@ public class DBSqlite extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + TableProd.TABLE_PROD;
     private static final String SQL_DELETE_ENTRIES_VENT =
             "DROP TABLE IF EXISTS " + TableVent.TABLE_VENT;
+    private static final String SQL_DELETE_ENTRIES_BALANCE =
+            "DROP TABLE IF EXISTS " + TableBalance.TABLE_BALANCE;
 
     public DBSqlite(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -86,6 +109,7 @@ public class DBSqlite extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(SQL_CREATE_TABLE_USER);
+        db.execSQL(SQL_CREATE_TABLE_BALANCE);
         db.execSQL(SQL_CREATE_TABLE_PROD);
         db.execSQL(SQL_CREATE_TABLE_VENT);
     }
@@ -93,6 +117,7 @@ public class DBSqlite extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(SQL_DELETE_ENTRIES_USER);
+        db.execSQL(SQL_DELETE_ENTRIES_BALANCE);
         db.execSQL(SQL_DELETE_ENTRIES_PROD);
         db.execSQL(SQL_DELETE_ENTRIES_VENT);
         onCreate(db);

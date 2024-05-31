@@ -20,7 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class ActivityShowProd extends AppCompatActivity {
 
     TextView lblCod, lblNom, lblMar, lblDes, lblPre, lblCos;
-    Button btnModificar, btnEliminar;
+    Button btnModificar, btnEliminar, btnVender;
     ImageView imgFotoProd;
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
@@ -39,6 +39,7 @@ public class ActivityShowProd extends AppCompatActivity {
         lblCos = findViewById(R.id.lblCos);
         btnModificar = findViewById(R.id.btnModificar);
         btnEliminar = findViewById(R.id.btnEliminar);
+        btnVender = findViewById(R.id.btnVender);
         imgFotoProd = findViewById(R.id.imgProd);
 
         dbSqlite = new DBSqlite(this);
@@ -78,6 +79,16 @@ public class ActivityShowProd extends AppCompatActivity {
             }
         });
 
+        btnVender.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClassProductos productoSeleccionado = (ClassProductos) getIntent().getSerializableExtra("producto");
+
+                Intent intent = new Intent(getApplicationContext(), ActivityAddVent.class);
+                intent.putExtra("producto", productoSeleccionado);
+                startActivity(intent);
+            }
+        });
     }
 
     private void mostrarDialogoConfirmacion() {

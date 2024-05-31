@@ -40,7 +40,7 @@ import java.util.Map;
 
 public class ActivityAddProd extends AppCompatActivity {
 
-    EditText txtCod, txtNom, txtMar, txtDesc, txtPrec, txtCost;
+    EditText txtCod, txtNom, txtMar, txtDesc, txtPrec, txtCost, txtStock;
     ImageView imgProd;
     ClassFoto classFoto;
     Button btnGuardarProd;
@@ -120,6 +120,7 @@ public class ActivityAddProd extends AppCompatActivity {
                     txtDesc.setText(producto.getDescripcion());
                     txtPrec.setText(producto.getPrecio().toString());
                     txtCost.setText(producto.getCosto().toString());
+                    txtStock.setText(String.valueOf(producto.getStock()));
 
                     String urlCompletaFoto = producto.getFoto();
                     Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
@@ -137,6 +138,7 @@ public class ActivityAddProd extends AppCompatActivity {
                 String descripcion = txtDesc.getText().toString();
                 String precio = txtPrec.getText().toString();
                 String costo = txtCost.getText().toString();
+                String stock = txtStock.getText().toString();
                 String foto = classFoto.urlCompletaFoto;
 
                 if (intent != null && intent.hasExtra("producto")) {
@@ -159,6 +161,7 @@ public class ActivityAddProd extends AppCompatActivity {
                             values.put(DBSqlite.TableProd.COLUMN_DESCRIPCION, descripcion);
                             values.put(DBSqlite.TableProd.COLUMN_PRECIO, precio);
                             values.put(DBSqlite.TableProd.COLUMN_COSTO, costo);
+                            values.put(DBSqlite.TableProd.COLUMN_STOCK, stock);
                             values.put(DBSqlite.TableProd.COLUMN_FOTO, urlCompletaFoto);
 
                             String selection = DBSqlite.TableProd.COLUMN_CODIGO + " = ?";
@@ -191,6 +194,7 @@ public class ActivityAddProd extends AppCompatActivity {
                         values.put(DBSqlite.TableProd.COLUMN_DESCRIPCION, descripcion);
                         values.put(DBSqlite.TableProd.COLUMN_PRECIO, precio);
                         values.put(DBSqlite.TableProd.COLUMN_COSTO, costo);
+                        values.put(DBSqlite.TableProd.COLUMN_STOCK, stock);
                         values.put(DBSqlite.TableProd.COLUMN_FOTO, foto);
 
                         long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
@@ -216,6 +220,7 @@ public class ActivityAddProd extends AppCompatActivity {
         txtDesc = findViewById(R.id.txtDesc);
         txtPrec = findViewById(R.id.txtPrec);
         txtCost = findViewById(R.id.txtCost);
+        txtStock = findViewById(R.id.txtStock);
         btnGuardarProd = findViewById(R.id.btnGuardarProd);
         imgProd = findViewById(R.id.btnImgProd);
 

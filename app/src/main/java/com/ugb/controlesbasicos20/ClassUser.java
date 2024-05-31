@@ -1,12 +1,14 @@
 package com.ugb.controlesbasicos20;
 
+import java.io.Serializable;
+
 public class ClassUser {
     private String foto;
     private String nombre;
     private String email;
     private String tipoCuenta;
 
-    public ClassUser(String foto ,String nombre ,String email, String tipoCuenta) {
+    public ClassUser(String foto, String nombre, String email, String tipoCuenta) {
         this.foto = foto;
         this.nombre = nombre;
         this.email = email;

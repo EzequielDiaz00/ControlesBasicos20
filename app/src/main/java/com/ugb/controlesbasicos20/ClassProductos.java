@@ -10,9 +10,10 @@ public class ClassProductos implements Serializable {
     private String descripcion;
     private Double precio;
     private Double costo;
+    private int stock;
     private String foto;
 
-    public ClassProductos(String user, String codigo, String nombre, String marca, String descripcion, Double precio, Double costo, String foto) {
+    public ClassProductos(String user, String codigo, String nombre, String marca, String descripcion, Double precio, Double costo, int stock, String foto) {
         this.user = user;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -20,6 +21,7 @@ public class ClassProductos implements Serializable {
         this.descripcion = descripcion;
         this.precio = precio;
         this.costo = costo;
+        this.stock = stock;
         this.foto = foto;
     }
 
@@ -49,6 +51,10 @@ public class ClassProductos implements Serializable {
 
     public Double getCosto() {
         return costo;
+    }
+
+    public int getStock() {
+        return stock;
     }
 
     public String getFoto() {

@@ -82,6 +82,7 @@ public class ActivityProductos extends AppCompatActivity {
                 DBSqlite.TableProd.COLUMN_DESCRIPCION,
                 DBSqlite.TableProd.COLUMN_PRECIO,
                 DBSqlite.TableProd.COLUMN_COSTO,
+                DBSqlite.TableProd.COLUMN_STOCK,
                 DBSqlite.TableProd.COLUMN_FOTO
         };
 
@@ -109,6 +110,7 @@ public class ActivityProductos extends AppCompatActivity {
                     int descripcionIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_DESCRIPCION);
                     int precioIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_PRECIO);
                     int costoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_COSTO);
+                    int stockIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_STOCK);
                     int fotoIndex = cursor.getColumnIndex(DBSqlite.TableProd.COLUMN_FOTO);
 
                     if (codigoIndex != -1 && nombreIndex != -1 && precioIndex != -1) {
@@ -119,9 +121,10 @@ public class ActivityProductos extends AppCompatActivity {
                         String descripcion = cursor.getString(descripcionIndex);
                         Double precio = Double.valueOf(cursor.getString(precioIndex));
                         Double costo = Double.valueOf(cursor.getString(costoIndex));
+                        int stock = Integer.parseInt(cursor.getString(stockIndex));
                         String foto = cursor.getString(fotoIndex);
 
-                        productos.add(new ClassProductos(user, codigo, nombre, marca, descripcion, precio, costo, foto));
+                        productos.add(new ClassProductos(user, codigo, nombre, marca, descripcion, precio, costo, stock, foto));
                     } else {
                         Toast.makeText(this, "No se pudieron mostrar los productos", Toast.LENGTH_SHORT).show();
                     }

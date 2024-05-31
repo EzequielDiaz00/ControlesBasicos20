@@ -34,7 +34,7 @@ import java.util.List;
 
 public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
-    Button btnCerrarSesion, btnAbrirProductos;
+    Button btnCerrarSesion, btnAbrirProductos, btnAbrirVentas;
     TextView lblNameUser, lblEmailUser, lblTypeAcc;
     ImageView imgFotoUser;
     ClassVerifyNet classVerifyNet;
@@ -74,6 +74,15 @@ public class ActivityMain extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btnAbrirVentas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void cargarGoogleSignIn() {
@@ -98,6 +107,7 @@ public class ActivityMain extends AppCompatActivity {
 
         btnAbrirProductos = findViewById(R.id.btnVistaProductos);
         btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
+        btnAbrirVentas = findViewById(R.id.btnVistaFinanzas);
 
         lblNameUser = findViewById(R.id.lblNameUser);
         lblEmailUser = findViewById(R.id.lblEmailUser);
