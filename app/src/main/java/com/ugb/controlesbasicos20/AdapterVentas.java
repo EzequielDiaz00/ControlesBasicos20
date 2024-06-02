@@ -31,26 +31,26 @@ public class AdapterVentas extends ArrayAdapter<ClassVenta> {
         TextView tvCliente = convertView.findViewById(R.id.lblCliente);
         TextView tvNom = convertView.findViewById(R.id.lblNom);
         TextView tvTot = convertView.findViewById(R.id.lblTot);
-        ImageView imgProd = convertView.findViewById(R.id.imgVent);
+        ImageView imgVent = convertView.findViewById(R.id.imgVent);
 
         if (venta != null) {
             tvCodigo.setText(venta.getCodigo());
             tvCliente.setText(venta.getCliente());
             tvNom.setText(venta.getNombre());
             tvTot.setText("$ " + venta.getTotalVent());
+            Log.d("AdapterVentas", "Datos> " + tvCliente);
 
             String urlCompletaFoto = venta.getFoto();
 
             if (urlCompletaFoto != null && !urlCompletaFoto.isEmpty()) {
                 Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                 if (imagenBitmap != null) {
-                    imgProd.setImageBitmap(imagenBitmap);
+                    imgVent.setImageBitmap(imagenBitmap);
                 } else {
-                    imgProd.setImageResource(R.drawable.ic_launcher_foreground);
+                    imgVent.setImageResource(R.drawable.ic_launcher_foreground);
                 }
             } else {
-                // Set a placeholder image or handle the error
-                imgProd.setImageResource(R.drawable.ic_launcher_foreground);
+                imgVent.setImageResource(R.drawable.ic_launcher_foreground);
             }
         }
 

@@ -7,14 +7,14 @@ public class ClassVenta {
     private String codigo;
     private String nombre;
     private String marca;
-    private String precio;
+    private Double precio;
     private String foto;
     private String fecha;
-    private String cantidad;
+    private Double cantidad;
     private String cliente;
-    private String totalVent;
+    private Double totalVent;
 
-    public ClassVenta(String user, String codigo, String nombre, String marca, String precio, String foto, String fecha, String cantidad, String cliente, String totalVent) {
+    public ClassVenta(String user, String codigo, String nombre, String marca, Double precio, String foto, String fecha, Double cantidad, String cliente, Double totalVent) {
         this.user = user;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -43,7 +43,7 @@ public class ClassVenta {
         return marca;
     }
 
-    public String getPrecio() {
+    public Double getPrecio() {
         return precio;
     }
 
@@ -55,7 +55,7 @@ public class ClassVenta {
         return fecha;
     }
 
-    public String getCantidad() {
+    public Double getCantidad() {
         return cantidad;
     }
 
@@ -63,7 +63,7 @@ public class ClassVenta {
         return cliente;
     }
 
-    public String getTotalVent() {
+    public Double getTotalVent() {
         return totalVent;
     }
 

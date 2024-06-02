@@ -39,7 +39,7 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     public static class TableVent implements BaseColumns {
         public static final String TABLE_VENT = "Ventas";
-        public static final String COLUMN_USER = "Fecha";
+        public static final String COLUMN_USER = "User";
         public static final String COLUMN_FECHA = "Fecha";
         public static final String COLUMN_FOTO_PROD = "Foto_Producto";
         public static final String COLUMN_ID_PROD = "ID_Producto";
@@ -83,15 +83,14 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableVent._ID + " INTEGER PRIMARY KEY," +
                     TableVent.COLUMN_USER + " TEXT," +
                     TableVent.COLUMN_FECHA + " TEXT," +
-                    TableVent.COLUMN_FOTO_PROD + " INTEGER," +
-                    TableVent.COLUMN_ID_PROD + " INTEGER," +
-                    TableVent.COLUMN_NOMBRE_PROD + " INTEGER," +
-                    TableVent.COLUMN_MARCA_PROD + " INTEGER," +
-                    TableVent.COLUMN_CANTIDAD + " INTEGER," +
-                    TableVent.COLUMN_PRECIO_UNITARIO + " REAL," +
+                    TableVent.COLUMN_FOTO_PROD + " TEXT," +
+                    TableVent.COLUMN_ID_PROD + " TEXT," +
+                    TableVent.COLUMN_NOMBRE_PROD + " TEXT," +
+                    TableVent.COLUMN_MARCA_PROD + " TEXT," +
+                    TableVent.COLUMN_CANTIDAD + " TEXT," +
+                    TableVent.COLUMN_PRECIO_UNITARIO + " TEXT," +
                     TableVent.COLUMN_CLIENTE + " TEXT," +
-                    TableVent.COLUMN_TOTAL_VENTA + " REAL," +
-                    "FOREIGN KEY(" + TableVent.COLUMN_ID_PROD + ") REFERENCES " + TableProd.TABLE_PROD + "(" + TableProd._ID + "))";
+                    TableVent.COLUMN_TOTAL_VENTA + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES_USER =
             "DROP TABLE IF EXISTS " + TableUser.TABLE_USER;

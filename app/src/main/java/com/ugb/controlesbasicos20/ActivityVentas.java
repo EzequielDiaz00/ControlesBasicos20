@@ -2,6 +2,7 @@ package com.ugb.controlesbasicos20;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -25,8 +26,8 @@ public class ActivityVentas extends AppCompatActivity {
     DBSqlite dbSqlite;
     SQLiteDatabase dbRead;
     AdapterVentas adapter;
-    List<ClassVenta> ventas;
     ActivityMain activityMain;
+    List<ClassVenta> ventas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,19 +44,14 @@ public class ActivityVentas extends AppCompatActivity {
         btnAddVent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), ActivityAddProd.class);
-                startActivity(intent);
+                // Manejar el evento de clic en el ítem
             }
         });
 
         listVent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                /*ClassProductos productoSeleccionado = venta.get(position);
-
-                Intent intent = new Intent(getApplicationContext(), ActivityShowProd.class);
-                intent.putExtra("producto", productoSeleccionado);
-                startActivity(intent);*/
+                // Manejar el evento de clic en el ítem
             }
         });
     }
@@ -87,7 +83,7 @@ public class ActivityVentas extends AppCompatActivity {
                 DBSqlite.TableVent.COLUMN_TOTAL_VENTA,
         };
 
-        String selection = DBSqlite.TableVent.COLUMN_USER + " = ?";
+        String selection = DBSqlite.TableProd.COLUMN_USER + " = ?";
         String[] selectionArgs = {userEmail};
 
         Cursor cursor = null;
@@ -122,32 +118,29 @@ public class ActivityVentas extends AppCompatActivity {
                         String codigo = cursor.getString(codigoIndex);
                         String nombre = cursor.getString(nombreIndex);
                         String marca = cursor.getString(marcaIndex);
-                        String cantidad = cursor.getString(cantidadIndex);
-                        String precio = cursor.getString(precioIndex);
+                        Double cantidad = Double.valueOf(cursor.getString(cantidadIndex));
+                        Double precio = Double.valueOf(cursor.getString(precioIndex));
                         String cliente = cursor.getString(clienteIndex);
-                        String total = cursor.getString(totalIndex);
+                        Double total = Double.valueOf(cursor.getString(totalIndex));
 
                         ventas.add(new ClassVenta(user, codigo, nombre, marca, precio, foto, fecha, cantidad, cliente, total));
                     } else {
-                        Toast.makeText(this, "No se pudieron mostrar los productos", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "No se pudieron mostrar las ventas", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
+            if (ventas.isEmpty()) {
+                Toast.makeText(this, "Aún no hay Ventas", Toast.LENGTH_SHORT).show();
+            } else {
+                adapter = new AdapterVentas(this, ventas);
+                listVent.setAdapter(adapter);
+            }
         } catch (Exception e) {
-            Log.d("ActivityProductos", "Error al extraer de SQLite: " + e.getMessage());
+            Log.d("ActivityVentas", "error: " + e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
             }
-        }
-
-        adapter = new AdapterVentas(this, ventas);
-        listVent.setAdapter(adapter);
-
-        if (ventas.isEmpty()) {
-            Toast.makeText(this, "Aún no hay Ventas", Toast.LENGTH_SHORT).show();
-        } else {
-            /*Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();*/
         }
     }
 }

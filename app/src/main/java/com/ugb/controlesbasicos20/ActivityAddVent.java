@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,6 +22,7 @@ public class ActivityAddVent extends AppCompatActivity {
     ImageView imgFoto;
     TextView lblCodigo, lblNombre, lblMarca, lblPrecio;
     EditText txtFecha, txtCantidad, txtCliente;
+    String urlCompletaFoto;
     Button btnVender;
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
@@ -75,7 +77,7 @@ public class ActivityAddVent extends AppCompatActivity {
                     lblMarca.setText(producto.getMarca());
                     lblPrecio.setText(producto.getPrecio().toString());
 
-                    String urlCompletaFoto = producto.getFoto();
+                    urlCompletaFoto = producto.getFoto();
                     Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
                     imgFoto.setImageBitmap(imagenBitmap);
                 }
@@ -88,31 +90,38 @@ public class ActivityAddVent extends AppCompatActivity {
         String codigo = lblCodigo.getText().toString();
         String nombre = lblNombre.getText().toString();
         String marca = lblMarca.getText().toString();
-        double prec = Double.parseDouble(String.valueOf(lblPrecio.getText()));
-        String precio = String.valueOf(prec);
-        String imgProd = imgFoto.toString();
+        Double prec = Double.parseDouble(lblPrecio.getText().toString());
+        String precio = prec.toString();
+        String imgProd = urlCompletaFoto;
         String fecha = txtFecha.getText().toString();
-        double cant = Double.parseDouble(String.valueOf(txtCantidad.getText()));
-        String cantidad = String.valueOf(cant);
+        Double cant = Double.parseDouble(txtCantidad.getText().toString());
+        String cantidad = cant.toString();
         String cliente = txtCliente.getText().toString();
 
-        double totalVent = cant * prec;
-        String total = String.valueOf(totalVent);
+        Double tot = prec * cant;
+        String total = tot.toString();
 
-        ContentValues values = new ContentValues();
-        values.put(DBSqlite.TableVent.COLUMN_USER, user);
-        values.put(DBSqlite.TableVent.COLUMN_ID_PROD, codigo);
-        values.put(DBSqlite.TableVent.COLUMN_NOMBRE_PROD, nombre);
-        values.put(DBSqlite.TableVent.COLUMN_MARCA_PROD, marca);
-        values.put(DBSqlite.TableVent.COLUMN_PRECIO_UNITARIO, precio);
-        values.put(DBSqlite.TableVent.COLUMN_FOTO_PROD, imgProd);
-        values.put(DBSqlite.TableVent.COLUMN_FECHA, fecha);
-        values.put(DBSqlite.TableVent.COLUMN_CANTIDAD, cantidad);
-        values.put(DBSqlite.TableVent.COLUMN_CLIENTE, cliente);
-        values.put(DBSqlite.TableVent.COLUMN_TOTAL_VENTA, total);
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DBSqlite.TableVent.COLUMN_USER, user);
+            values.put(DBSqlite.TableVent.COLUMN_ID_PROD, codigo);
+            values.put(DBSqlite.TableVent.COLUMN_NOMBRE_PROD, nombre);
+            values.put(DBSqlite.TableVent.COLUMN_MARCA_PROD, marca);
+            values.put(DBSqlite.TableVent.COLUMN_PRECIO_UNITARIO, precio);
+            values.put(DBSqlite.TableVent.COLUMN_FOTO_PROD, imgProd);
+            values.put(DBSqlite.TableVent.COLUMN_FECHA, fecha);
+            values.put(DBSqlite.TableVent.COLUMN_CANTIDAD, cantidad);
+            values.put(DBSqlite.TableVent.COLUMN_CLIENTE, cliente);
+            values.put(DBSqlite.TableVent.COLUMN_TOTAL_VENTA, total);
 
-        Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
-        startActivity(intent);
-        finish();
+            long newRowId = dbWrite.insert(DBSqlite.TableVent.TABLE_VENT, null, values);
+
+            Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
+            startActivity(intent);
+            finish();
+
+        } catch (Exception ex) {
+            Log.d("ActivityAddVent", "Error al añadir venta: " + ex.getMessage());
+        }
     }
 }

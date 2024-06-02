@@ -72,7 +72,7 @@ public class ActivityProductos extends AppCompatActivity {
     }
 
     private void loadDataFromSqlite(String userEmail) {
-        productos = new ArrayList<>();  // Inicializa aquí
+        productos = new ArrayList<>();
 
         String[] projection = {
                 DBSqlite.TableProd.COLUMN_USER,
@@ -130,21 +130,18 @@ public class ActivityProductos extends AppCompatActivity {
                     }
                 }
             }
+            if (productos.isEmpty()) {
+                Toast.makeText(this, "Aún no hay productos. ¡Agrega uno!", Toast.LENGTH_SHORT).show();
+            } else {
+                adapter = new AdapterProductos(this, productos);
+                listProd.setAdapter(adapter);
+            }
         } catch (Exception e) {
             Log.d("ActivityProductos", "Error al extraer de SQLite: " + e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();
             }
-        }
-
-        adapter = new AdapterProductos(this, productos);
-        listProd.setAdapter(adapter);
-
-        if (productos.isEmpty()) {
-            Toast.makeText(this, "Aún no hay productos. ¡Agrega uno!", Toast.LENGTH_SHORT).show();
-        } else {
-            /*Toast.makeText(this, "Mostrando productos", Toast.LENGTH_SHORT).show();*/
         }
     }
 }
