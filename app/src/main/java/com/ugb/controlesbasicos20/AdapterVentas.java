@@ -38,7 +38,6 @@ public class AdapterVentas extends ArrayAdapter<ClassVenta> {
             tvCliente.setText(venta.getCliente());
             tvNom.setText(venta.getNombre());
             tvTot.setText("$ " + venta.getTotalVent());
-            Log.d("AdapterVentas", "Datos> " + tvCliente);
 
             String urlCompletaFoto = venta.getFoto();
 

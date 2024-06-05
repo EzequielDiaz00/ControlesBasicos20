@@ -292,6 +292,7 @@ public class ActivityAddProd extends AppCompatActivity {
                         Uri downloadUri = task.getResult();
 
                         updateDataToFirebase(userEmail, codigo, nombre, downloadUri.toString());
+                        updateDataToSqlite(codigo, downloadUri.toString());
                     }
                 } catch (Exception ex) {
                     Log.d("ActivityAddProd_insertDataToStorage", "Error al extraer URL de Storage: " + ex.getMessage());
@@ -315,5 +316,21 @@ public class ActivityAddProd extends AppCompatActivity {
                 Log.d("ActivityAddProd_updateDataToFirebase", "Error al actualizar los datos en Firebase: " + e.getMessage());
             }
         });
+    }
+
+    private void updateDataToSqlite(String codigo, String fotoUrl) {
+        ContentValues values = new ContentValues();
+        values.put(DBSqlite.TableProd.COLUMN_CODIGO, codigo);
+        values.put(DBSqlite.TableProd.COLUMN_FOTO_URL, fotoUrl);
+
+        String selection = DBSqlite.TableProd.COLUMN_CODIGO + " = ?";
+        String[] selectionArgs = {codigo};
+
+        int rowsUpdated = dbWrite.update(
+                DBSqlite.TableProd.TABLE_PROD,
+                values,
+                selection,
+                selectionArgs
+        );
     }
 }

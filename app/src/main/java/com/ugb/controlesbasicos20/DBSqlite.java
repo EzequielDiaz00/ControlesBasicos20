@@ -1,6 +1,7 @@
 package com.ugb.controlesbasicos20;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
@@ -19,7 +20,7 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     public static class TableBalance implements BaseColumns {
         public static final String TABLE_BALANCE = "Balance";
-        public static final String COLUMN_PROD = "Total_Prod";
+        public static final String COLUMN_USER = "User";
         public static final String COLUMN_COMP = "Total_Compra";
         public static final String COLUMN_VENT = "Total_Venta";
     }
@@ -35,6 +36,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_COSTO = "Costo";
         public static final String COLUMN_STOCK = "Stock";
         public static final String COLUMN_FOTO = "Foto";
+        public static final String COLUMN_FOTO_URL = "FotoURL";
     }
 
     public static class TableVent implements BaseColumns {
@@ -42,6 +44,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_USER = "User";
         public static final String COLUMN_FECHA = "Fecha";
         public static final String COLUMN_FOTO_PROD = "Foto_Producto";
+        public static final String COLUMN_FOTO_Url = "Foto_Url";
         public static final String COLUMN_ID_PROD = "ID_Producto";
         public static final String COLUMN_NOMBRE_PROD = "Nombre_Producto";
         public static final String COLUMN_MARCA_PROD = "Marca_Producto";
@@ -49,6 +52,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_PRECIO_UNITARIO = "Precio_Unitario";
         public static final String COLUMN_CLIENTE = "Cliente";
         public static final String COLUMN_TOTAL_VENTA = "Total_Venta";
+        public static final String COLUMN_GANANCIA = "Ganancia";
     }
 
     private static final String SQL_CREATE_TABLE_USER =
@@ -61,7 +65,7 @@ public class DBSqlite extends SQLiteOpenHelper {
     private static final String SQL_CREATE_TABLE_BALANCE =
             "CREATE TABLE " + TableBalance.TABLE_BALANCE + " (" +
                     TableBalance._ID + " INTEGER PRIMARY KEY," +
-                    TableBalance.COLUMN_PROD + " TEXT," +
+                    TableBalance.COLUMN_USER + " TEXT," +
                     TableBalance.COLUMN_COMP + " TEXT," +
                     TableBalance.COLUMN_VENT + " TEXT)";
 
@@ -76,7 +80,8 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableProd.COLUMN_PRECIO + " TEXT," +
                     TableProd.COLUMN_COSTO + " TEXT," +
                     TableProd.COLUMN_STOCK + " TEXT," +
-                    TableProd.COLUMN_FOTO + " TEXT)";
+                    TableProd.COLUMN_FOTO + " TEXT," +
+                    TableProd.COLUMN_FOTO_URL + " TEXT)";
 
     private static final String SQL_CREATE_TABLE_VENT =
             "CREATE TABLE " + TableVent.TABLE_VENT + " (" +
@@ -84,12 +89,14 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableVent.COLUMN_USER + " TEXT," +
                     TableVent.COLUMN_FECHA + " TEXT," +
                     TableVent.COLUMN_FOTO_PROD + " TEXT," +
+                    TableVent.COLUMN_FOTO_Url + " TEXT," +
                     TableVent.COLUMN_ID_PROD + " TEXT," +
                     TableVent.COLUMN_NOMBRE_PROD + " TEXT," +
                     TableVent.COLUMN_MARCA_PROD + " TEXT," +
                     TableVent.COLUMN_CANTIDAD + " TEXT," +
                     TableVent.COLUMN_PRECIO_UNITARIO + " TEXT," +
                     TableVent.COLUMN_CLIENTE + " TEXT," +
+                    TableVent.COLUMN_GANANCIA + " TEXT," +
                     TableVent.COLUMN_TOTAL_VENTA + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES_USER =
@@ -125,5 +132,35 @@ public class DBSqlite extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public int getCountVent() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String countQuery = "SELECT COUNT(*) FROM " + TableVent.TABLE_VENT;
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+
+        return count;
+    }
+
+    public int getCountProd() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String countQuery = "SELECT COUNT(*) FROM " + TableProd.TABLE_PROD;
+        Cursor cursor = db.rawQuery(countQuery, null);
+
+        int count = 0;
+        if (cursor.moveToFirst()) {
+            count = cursor.getInt(0);
+        }
+        cursor.close();
+        db.close();
+
+        return count;
     }
 }
