@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ActivityShowProd extends AppCompatActivity {
@@ -22,6 +23,7 @@ public class ActivityShowProd extends AppCompatActivity {
     TextView lblCod, lblNom, lblMar, lblDes, lblPre, lblCos;
     Button btnModificar, btnEliminar, btnVender;
     ImageView imgFotoProd;
+    FloatingActionButton fabHome, fabInv, fabFin;
     DBSqlite dbSqlite;
     SQLiteDatabase dbWrite;
     FirebaseFirestore databaseFirebase;
@@ -41,6 +43,9 @@ public class ActivityShowProd extends AppCompatActivity {
         btnEliminar = findViewById(R.id.btnEliminar);
         btnVender = findViewById(R.id.btnVender);
         imgFotoProd = findViewById(R.id.imgProd);
+        fabHome = findViewById(R.id.fabHome);
+        fabInv = findViewById(R.id.fabInvent);
+        fabFin = findViewById(R.id.fabFinance);
 
         dbSqlite = new DBSqlite(this);
         dbWrite = dbSqlite.getWritableDatabase();
@@ -60,6 +65,33 @@ public class ActivityShowProd extends AppCompatActivity {
             Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
             imgFotoProd.setImageBitmap(imagenBitmap);
         }
+
+        fabHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabInv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabFin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         btnModificar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,7 +137,7 @@ public class ActivityShowProd extends AppCompatActivity {
                 .show();
     }
 
-    private void eliminarProducto(){
+    private void eliminarProducto() {
         ClassProductos producto = (ClassProductos) getIntent().getSerializableExtra("producto");
 
         if (producto != null) {

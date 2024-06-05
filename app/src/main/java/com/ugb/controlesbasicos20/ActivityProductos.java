@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ public class ActivityProductos extends AppCompatActivity {
     EditText txtBuscarProd;
     ListView listProd;
     Button btnAddProd;
+    FloatingActionButton fabHome, fabInv, fabFin;
     DBSqlite dbSqlite;
     SQLiteDatabase dbRead;
     AdapterProductos adapter;
@@ -39,6 +42,33 @@ public class ActivityProductos extends AppCompatActivity {
         cargarSqlite();
         cargarObjetos();
         loadDataFromSqlite(userEmailLog);
+
+        fabHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabInv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabFin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         btnAddProd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +94,9 @@ public class ActivityProductos extends AppCompatActivity {
         txtBuscarProd = findViewById(R.id.txtBuscarProd);
         listProd = findViewById(R.id.listProd);
         btnAddProd = findViewById(R.id.btnAddProd);
+        fabHome = findViewById(R.id.fabHome);
+        fabInv = findViewById(R.id.fabInvent);
+        fabFin = findViewById(R.id.fabFinance);
     }
 
     private void cargarSqlite() {

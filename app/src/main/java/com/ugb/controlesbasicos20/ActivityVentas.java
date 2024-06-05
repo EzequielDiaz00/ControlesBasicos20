@@ -2,6 +2,7 @@ package com.ugb.controlesbasicos20;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -13,19 +14,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ActivityVentas extends AppCompatActivity {
 
-    private EditText txtBuscarVent;
-    private TextView lblVentas, lblGanancia;
-    private ListView listVent;
-    private DBSqlite dbSqlite;
-    private SQLiteDatabase dbRead;
-    private AdapterVentas adapter;
-    private List<ClassVenta> ventas;
-    private List<ClassBalance> balance;
+    EditText txtBuscarVent;
+    TextView lblVentas, lblGanancia;
+    ListView listVent;
+    FloatingActionButton fabHome, fabInv, fabFin;
+    DBSqlite dbSqlite;
+    SQLiteDatabase dbRead;
+    AdapterVentas adapter;
+    List<ClassVenta> ventas;
+    List<ClassBalance> balance;
     ActivityMain activityMain;
 
     @Override
@@ -40,6 +44,33 @@ public class ActivityVentas extends AppCompatActivity {
         cargarObjetos();
         loadDataFromSqlite(userEmailLog);
 
+        fabHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityMain.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabInv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityProductos.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        fabFin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityVentas.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
         listVent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -53,6 +84,9 @@ public class ActivityVentas extends AppCompatActivity {
         listVent = findViewById(R.id.listVent);
         lblVentas = findViewById(R.id.totVentas);
         lblGanancia = findViewById(R.id.totGanancia);
+        fabHome = findViewById(R.id.fabHome);
+        fabInv = findViewById(R.id.fabInvent);
+        fabFin = findViewById(R.id.fabFinance);
     }
 
     private void cargarSqlite() {

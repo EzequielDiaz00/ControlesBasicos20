@@ -96,9 +96,9 @@ public class ActivityMain extends AppCompatActivity {
         tbhMain = findViewById(R.id.tbhMain);
         tbhMain.setup();
         TabHost.TabSpec spec = tbhMain.newTabSpec("Inicio");
-        tbhMain.addTab(tbhMain.newTabSpec("INV").setContent(R.id.tabInventario).setIndicator("Inventario", null));
-        tbhMain.addTab(tbhMain.newTabSpec("INI").setContent(R.id.tabInicio).setIndicator("Inicio", null));
-        tbhMain.addTab(tbhMain.newTabSpec("FIN").setContent(R.id.tabFinanzas).setIndicator("Finanzas", null));
+        tbhMain.addTab(tbhMain.newTabSpec("INV").setContent(R.id.tabInventario).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_box1)));
+        tbhMain.addTab(tbhMain.newTabSpec("INI").setContent(R.id.tabInicio).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_home1)));
+        tbhMain.addTab(tbhMain.newTabSpec("FIN").setContent(R.id.tabFinanzas).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_wallet1)));
         tbhMain.setCurrentTab(1);
 
         classVerifyNet = new ClassVerifyNet(ActivityMain.this);
