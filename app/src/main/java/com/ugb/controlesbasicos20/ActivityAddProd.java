@@ -141,6 +141,11 @@ public class ActivityAddProd extends AppCompatActivity {
                 String stock = txtStock.getText().toString();
                 String foto = classFoto.urlCompletaFoto;
 
+                if (codigo == null || nombre == null || marca == null || precio == null || foto == null || descripcion == null || costo == null || stock == null) {
+                    Toast.makeText(ActivityAddProd.this, "Ingrese datos en los campos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (intent != null && intent.hasExtra("producto")) {
                     // Actualizar producto existente
                     ClassProductos producto = (ClassProductos) intent.getSerializableExtra("producto");

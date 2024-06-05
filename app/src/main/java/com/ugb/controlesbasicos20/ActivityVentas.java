@@ -74,7 +74,11 @@ public class ActivityVentas extends AppCompatActivity {
         listVent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Manejar el evento de clic en el ítem
+                ClassVenta ventaSeleccionada = ventas.get(position);
+
+                Intent intent = new Intent(getApplicationContext(), ActivityShowVent.class);
+                intent.putExtra("venta", ventaSeleccionada);
+                startActivity(intent);
             }
         });
     }
@@ -103,6 +107,7 @@ public class ActivityVentas extends AppCompatActivity {
 
     private void loadDataVentasSqlite(String userEmail) {
         String[] projectionVent = {
+                DBSqlite.TableVent._ID,
                 DBSqlite.TableVent.COLUMN_USER,
                 DBSqlite.TableVent.COLUMN_FECHA,
                 DBSqlite.TableVent.COLUMN_FOTO_PROD,
@@ -131,6 +136,7 @@ public class ActivityVentas extends AppCompatActivity {
         )) {
             if (cursorVent != null) {
                 while (cursorVent.moveToNext()) {
+                    String ID = cursorVent.getString(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent._ID));
                     String user = cursorVent.getString(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_USER));
                     String fecha = cursorVent.getString(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_FECHA));
                     String foto = cursorVent.getString(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_FOTO_PROD));
@@ -144,7 +150,7 @@ public class ActivityVentas extends AppCompatActivity {
                     double total = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_TOTAL_VENTA));
                     double ganancia = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_GANANCIA));
 
-                    ventas.add(new ClassVenta(user, codigo, nombre, marca, precio, foto, fotoUrl, fecha, cantidad, cliente, total, ganancia));
+                    ventas.add(new ClassVenta(ID, user, codigo, nombre, marca, precio, foto, fotoUrl, fecha, cantidad, cliente, total, ganancia));
                 }
                 if (!ventas.isEmpty()) {
                     adapter = new AdapterVentas(this, ventas);
@@ -190,7 +196,7 @@ public class ActivityVentas extends AppCompatActivity {
                     ClassBalance classBalance = balance.get(0);  // Suponiendo que sólo hay un balance por usuario
                     lblGanancia.setText("Total Ganancia: " + classBalance.getVenta());
                 } else {
-                    Toast.makeText(this, "No se pudieron mostrar las ganancias", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Aún no hay Ganancias", Toast.LENGTH_SHORT).show();
                 }
             }
         } catch (Exception e) {

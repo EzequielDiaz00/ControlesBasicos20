@@ -2,7 +2,8 @@ package com.ugb.controlesbasicos20;
 
 import java.io.Serializable;
 
-public class ClassVenta {
+public class ClassVenta implements Serializable {
+    private String ID;
     private String user;
     private String codigo;
     private String nombre;
@@ -16,7 +17,8 @@ public class ClassVenta {
     private Double totalVent;
     private Double ganancia;
 
-    public ClassVenta(String user, String codigo, String nombre, String marca, Double precio, String foto, String fotoUrl, String fecha, Double cantidad, String cliente, Double totalVent, Double ganancia) {
+    public ClassVenta(String ID, String user, String codigo, String nombre, String marca, Double precio, String foto, String fotoUrl, String fecha, Double cantidad, String cliente, Double totalVent, Double ganancia) {
+        this.ID = ID;
         this.user = user;
         this.codigo = codigo;
         this.nombre = nombre;
@@ -29,6 +31,10 @@ public class ClassVenta {
         this.cliente = cliente;
         this.totalVent = totalVent;
         this.ganancia = ganancia;
+    }
+
+    public String getID() {
+        return ID;
     }
 
     public String getUser() {

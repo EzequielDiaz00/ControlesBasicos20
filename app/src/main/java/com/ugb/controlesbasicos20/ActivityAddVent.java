@@ -111,6 +111,11 @@ public class ActivityAddVent extends AppCompatActivity {
             double ganancia = gananciaVent * cantidad;
             double total = precio * cantidad;
 
+            if (fecha == null || cantidad == -1 || cliente == null) {
+                Toast.makeText(ActivityAddVent.this, "Ingrese datos en los campos", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             ContentValues values = new ContentValues();
             values.put(DBSqlite.TableVent.COLUMN_USER, userEmail);
             values.put(DBSqlite.TableVent.COLUMN_ID_PROD, codigo);
