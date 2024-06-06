@@ -7,23 +7,25 @@
     tools:context=".ActivityProductos">
 
     <LinearLayout
+        android:id="@+id/layout11"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="horizontal">
-
-        <EditText
-            android:id="@+id/txtBuscarProd"
-            android:layout_width="250dp"
-            android:layout_height="50dp"
-            android:hint="Buscar Productos" />
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/btnAddProd"
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:text="Añadir producto"
-            android:textSize="15dp" />
+            android:textSize="20dp" />
+
+        <EditText
+            android:id="@+id/txtBuscarProd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Buscar Productos" />
     </LinearLayout>
 
 
@@ -31,7 +33,8 @@
         android:id="@+id/listProd"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="40dp" />
+        android:layout_below="@id/layout11"
+        android:layout_marginTop="10dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabHome"

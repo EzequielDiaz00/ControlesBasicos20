@@ -10,34 +10,30 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
-    Button btnCerrarSesion, btnAbrirProductos, btnAbrirVentas;
-    TextView lblNameUser, lblEmailUser, lblTypeAcc;
+    Button btnAbrirProductos, btnAbrirVentas;
+    TextView lblNameUser, lblGanancia, lblVentas, lblProductos, lblProdStock;
     ImageView imgFotoUser;
+    LinearLayout btnActUser;
     ClassVerifyNet classVerifyNet;
+    ClassLoadBalance classGanancia;
     FirebaseAuth auth;
     FirebaseUser userEmailAuth;
     GoogleSignInClient gsc;
@@ -60,10 +56,12 @@ public class ActivityMain extends AppCompatActivity {
 
         userLogin();
 
-        btnCerrarSesion.setOnClickListener(new View.OnClickListener() {
+        btnActUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                signOut();
+                Intent intent = new Intent(getApplicationContext(), ActivityUser.class);
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -95,7 +93,6 @@ public class ActivityMain extends AppCompatActivity {
     private void cargarObjetos() {
         tbhMain = findViewById(R.id.tbhMain);
         tbhMain.setup();
-        TabHost.TabSpec spec = tbhMain.newTabSpec("Inicio");
         tbhMain.addTab(tbhMain.newTabSpec("INV").setContent(R.id.tabInventario).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_box1)));
         tbhMain.addTab(tbhMain.newTabSpec("INI").setContent(R.id.tabInicio).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_home1)));
         tbhMain.addTab(tbhMain.newTabSpec("FIN").setContent(R.id.tabFinanzas).setIndicator("", getResources().getDrawable(R.drawable.ic_manage360_wallet1)));
@@ -105,13 +102,15 @@ public class ActivityMain extends AppCompatActivity {
         classVerifyNet.isOnlineNet();
 
         btnAbrirProductos = findViewById(R.id.btnVistaProductos);
-        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnAbrirVentas = findViewById(R.id.btnVistaFinanzas);
 
         lblNameUser = findViewById(R.id.lblNameUser);
-        lblEmailUser = findViewById(R.id.lblEmailUser);
-        lblTypeAcc = findViewById(R.id.lblTypeAcc);
+        lblGanancia = findViewById(R.id.lblCountGanancia);
+        lblVentas = findViewById(R.id.lblCountVent);
+        lblProductos = findViewById(R.id.lblCountProd);
+        lblProdStock = findViewById(R.id.lblCountStock);
         imgFotoUser = findViewById(R.id.imgFotoUser);
+        btnActUser = findViewById(R.id.btnActUser);
 
         auth = FirebaseAuth.getInstance();
         userEmailAuth = auth.getCurrentUser();
@@ -126,6 +125,7 @@ public class ActivityMain extends AppCompatActivity {
             String userEmailGoogle = acct.getEmail();
             userEmailLogin = userEmailGoogle;
             showDataSqlite(userEmailGoogle);
+            loadDataBalanceSqlite(userEmailGoogle);
         } else {
             if (userEmailAuth == null) {
                 Intent intent = new Intent(getApplicationContext(), ActivityLogin.class);
@@ -135,6 +135,7 @@ public class ActivityMain extends AppCompatActivity {
                 String userEmailCorreo = userEmailAuth.getEmail();
                 userEmailLogin = userEmailCorreo;
                 showDataSqlite(userEmailCorreo);
+                loadDataBalanceSqlite(userEmailCorreo);
             }
         }
     }
@@ -145,8 +146,6 @@ public class ActivityMain extends AppCompatActivity {
     }
 
     private void showDataSqlite(String userEmail) {
-        List<ClassUser> users = new ArrayList<>();
-
         String[] projection = {
                 DBSqlite.TableUser.COLUMN_NOMBRE,
                 DBSqlite.TableUser.COLUMN_CORREO,
@@ -157,57 +156,59 @@ public class ActivityMain extends AppCompatActivity {
         String selection = DBSqlite.TableUser.COLUMN_CORREO + " = ?";
         String[] selectionArgs = {userEmail};
 
-        Cursor cursor = null;
-        try {
-            cursor = dbRead.query(
-                    DBSqlite.TableUser.TABLE_USER,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    null
-            );
+        try (Cursor cursor = dbRead.query(
+                DBSqlite.TableUser.TABLE_USER,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        )) {
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    int nombreIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_NOMBRE);
+                    int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
+                    int typeIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_TYPE);
+                    int fotoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_FOTO);
 
-            if (cursor != null && cursor.moveToFirst()) {
-                int nombreIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_NOMBRE);
-                int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
-                int typeIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_TYPE);
-                int fotoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_FOTO);
+                    String nombre = cursor.getString(nombreIndex);
+                    String correo = cursor.getString(correoIndex);
+                    String type = cursor.getString(typeIndex);
+                    String foto = cursor.getString(fotoIndex);
 
-                String nombre = cursor.getString(nombreIndex);
-                String correo = cursor.getString(correoIndex);
-                String type = cursor.getString(typeIndex);
-                String foto = cursor.getString(fotoIndex);
+                    ClassUser usuario = new ClassUser(foto, nombre, correo, type);
+                    lblNameUser.setText(usuario.getNombre());
 
-                ClassUser usuario = new ClassUser(foto, nombre, correo, type);
-                lblNameUser.setText(usuario.getNombre());
-                lblEmailUser.setText(usuario.getEmail());
-                lblTypeAcc.setText(usuario.getTipoCuenta());
-
-                Bitmap imagenBitmap = BitmapFactory.decodeFile(usuario.getFoto());
-                imgFotoUser.setImageBitmap(imagenBitmap);
-            } else {
-                Toast.makeText(this, "No se encontraron datos", Toast.LENGTH_SHORT).show();
+                    Bitmap imagenBitmap = BitmapFactory.decodeFile(usuario.getFoto());
+                    imgFotoUser.setImageBitmap(imagenBitmap);
+                }
             }
         } catch (Exception e) {
             Log.d("ActivityMain", "Error al extraer de SQLite: " + e.getMessage());
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
     }
 
-    private void signOut() {
-        gsc.signOut().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getApplicationContext(), ActivityLogin.class);
-                startActivity(intent);
-                finish();
-            }
-        });
+    private void loadDataBalanceSqlite(String userEmail) {
+        int countVent = dbSqlite.getCountVent();
+        lblVentas.setText("Ventas hechas: " + countVent);
+
+        int countProd = dbSqlite.getCountProd();
+        lblProductos.setText("Productos: " + countProd);
+
+        classGanancia = new ClassLoadBalance(ActivityMain.this);
+
+        classGanancia.getGananciaSqlite();
+        classGanancia.getStockSqlite();
+
+        if (classGanancia.userGanancia == null) {
+            lblGanancia.setText("Ganancia Total: $0.0");
+        }
+        lblGanancia.setText("Ganancia Total: $" + classGanancia.userGanancia);
+
+        if (classGanancia.userStock == null) {
+            lblProdStock.setText("Productos en Stock: 0");
+        }
+        lblProdStock.setText("Productos en Stock: " + classGanancia.userStock);
     }
 }

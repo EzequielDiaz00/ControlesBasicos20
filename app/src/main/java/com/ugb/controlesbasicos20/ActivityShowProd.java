@@ -6,10 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -25,7 +27,8 @@ public class ActivityShowProd extends AppCompatActivity {
     ImageView imgFotoProd;
     FloatingActionButton fabHome, fabInv, fabFin;
     DBSqlite dbSqlite;
-    SQLiteDatabase dbWrite;
+    SQLiteDatabase dbWrite, dbRead;
+
     FirebaseFirestore databaseFirebase;
 
     @Override
@@ -49,17 +52,18 @@ public class ActivityShowProd extends AppCompatActivity {
 
         dbSqlite = new DBSqlite(this);
         dbWrite = dbSqlite.getWritableDatabase();
+        dbRead = dbSqlite.getReadableDatabase();
         databaseFirebase = FirebaseFirestore.getInstance();
 
         ClassProductos producto = (ClassProductos) getIntent().getSerializableExtra("producto");
 
         if (producto != null) {
-            lblCod.setText(producto.getCodigo());
-            lblNom.setText(producto.getNombre());
-            lblMar.setText(producto.getMarca());
-            lblDes.setText(producto.getDescripcion());
-            lblPre.setText(producto.getPrecio().toString());
-            lblCos.setText(producto.getCosto().toString());
+            lblCod.setText("Codigo: " + producto.getCodigo());
+            lblNom.setText("Nombre: " + producto.getNombre());
+            lblMar.setText("Marca: " + producto.getMarca());
+            lblDes.setText("Descripcion: " + producto.getDescripcion());
+            lblPre.setText("Precio: $" + producto.getPrecio().toString());
+            lblCos.setText("Costo: $" + producto.getCosto().toString());
 
             String urlCompletaFoto = producto.getFoto();
             Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
@@ -147,9 +151,65 @@ public class ActivityShowProd extends AppCompatActivity {
             // Eliminar producto de SQLite
             int deletedRows = dbWrite.delete(DBSqlite.TableProd.TABLE_PROD, selection, selectionArgs);
 
+            // Actualizar Balance
+            String[] projection = {
+                    DBSqlite.TableBalance.COLUMN_USER,
+                    DBSqlite.TableBalance.COLUMN_PROD,
+                    DBSqlite.TableBalance.COLUMN_VENT
+            };
+
+            String userEmail = ActivityMain.userEmailLogin;
+            String selection1 = DBSqlite.TableBalance.COLUMN_USER + " = ?";
+            String[] selectionArgs1 = {userEmail};
+
+            Cursor cursor = null;
+            try {
+                cursor = dbRead.query(
+                        DBSqlite.TableBalance.TABLE_BALANCE,
+                        projection,
+                        selection1,
+                        selectionArgs1,
+                        null,
+                        null,
+                        null
+                );
+
+                if (cursor != null && cursor.moveToFirst()) {
+                    int stockIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_PROD);
+
+                    if (stockIndex != -1) {
+                        Double currentStock = cursor.getDouble(stockIndex);
+                        Double stock = Double.valueOf(producto.getStock());
+                        Double totStock = currentStock - stock;
+
+                        ContentValues values = new ContentValues();
+                        values.put(DBSqlite.TableBalance.COLUMN_PROD, totStock);
+
+                        String updateSelection = DBSqlite.TableBalance.COLUMN_USER + " = ?";
+                        String[] updateSelectionArgs = {userEmail};
+
+                        int rowsUpdated = dbWrite.update(DBSqlite.TableBalance.TABLE_BALANCE, values, updateSelection, updateSelectionArgs);
+
+                        if (rowsUpdated > 0) {
+                            Log.d("ActivityShowProd", "Datos actualizados correctamente en el balance");
+                        } else {
+                            Log.d("ActivityShowProd", "No se actualizaron los datos en el balance");
+                        }
+                    } else {
+                        Log.d("ActivityShowProd", "Columnas de ventas o stock no encontradas");
+                    }
+                }
+            } catch (Exception ex) {
+                Log.e("ActivityShowProd", "Error al actualizar el balance", ex);
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+
             // Eliminar producto de Firebase
-            String userEmail = new ActivityMain().userEmailLogin;
-            databaseFirebase.collection(userEmail)
+            String userEmail1 = new ActivityMain().userEmailLogin;
+            databaseFirebase.collection(userEmail1)
                     .document("tableProductos")
                     .collection(producto.getCodigo())
                     .document(producto.getNombre())

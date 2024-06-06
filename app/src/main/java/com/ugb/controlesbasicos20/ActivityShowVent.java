@@ -27,8 +27,7 @@ public class ActivityShowVent extends AppCompatActivity {
     ImageView imgFotoVent;
     FloatingActionButton fabHome, fabInv, fabFin;
     DBSqlite dbSqlite;
-    SQLiteDatabase dbWrite;
-    SQLiteDatabase dbRead;
+    SQLiteDatabase dbWrite, dbRead;
     FirebaseFirestore databaseFirebase;
 
     @Override
@@ -60,15 +59,15 @@ public class ActivityShowVent extends AppCompatActivity {
         ClassVenta venta = (ClassVenta) getIntent().getSerializableExtra("venta");
 
         if (venta != null) {
-            lblCod.setText(venta.getCodigo());
-            lblNom.setText(venta.getNombre());
-            lblMar.setText(venta.getMarca());
-            lblPre.setText(venta.getPrecio().toString());
-            lblTot.setText(venta.getTotalVent().toString());
-            lblGan.setText(venta.getGanancia().toString());
-            lblCant.setText(venta.getCantidad().toString());
-            lblClient.setText(venta.getCliente());
-            lblFec.setText(venta.getFecha());
+            lblCod.setText("Codigo: " + venta.getCodigo());
+            lblNom.setText("Nombre: " + venta.getNombre());
+            lblMar.setText("Marca: " + venta.getMarca());
+            lblPre.setText("Precio: $" + venta.getPrecio().toString());
+            lblTot.setText("Total venta: $" + venta.getTotalVent().toString());
+            lblGan.setText("Ganancia: $" + venta.getGanancia().toString());
+            lblCant.setText("Cantidad: " + venta.getCantidad().toString());
+            lblClient.setText("Cliente: " + venta.getCliente());
+            lblFec.setText("Fecha: " + venta.getFecha());
 
             String urlCompletaFoto = venta.getFoto();
             Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);
@@ -113,7 +112,7 @@ public class ActivityShowVent extends AppCompatActivity {
     private void mostrarDialogoConfirmacion() {
         new AlertDialog.Builder(this)
                 .setTitle("Confirmar eliminación")
-                .setMessage("¿Estás seguro de que deseas eliminar este producto?")
+                .setMessage("¿Estás seguro de que deseas eliminar esta venta?")
                 .setPositiveButton("Sí", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -137,7 +136,7 @@ public class ActivityShowVent extends AppCompatActivity {
             // Actualizar Balance
             String[] projection = {
                     DBSqlite.TableBalance.COLUMN_USER,
-                    DBSqlite.TableBalance.COLUMN_COMP,
+                    DBSqlite.TableBalance.COLUMN_PROD,
                     DBSqlite.TableBalance.COLUMN_VENT
             };
 
@@ -159,11 +158,10 @@ public class ActivityShowVent extends AppCompatActivity {
 
                 if (cursor != null && cursor.moveToFirst()) {
                     int ventIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_VENT);
-                    int compIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_COMP);
 
-                    if (ventIndex != -1 && compIndex != -1) {
+                    if (ventIndex != -1) {
                         Double currentVent = cursor.getDouble(ventIndex);
-                        Double ventas = Double.parseDouble(lblGan.getText().toString());
+                        Double ventas = Double.valueOf(venta.getGanancia().toString());
                         Double totVent = currentVent - ventas;
 
                         ContentValues values = new ContentValues();
@@ -180,7 +178,7 @@ public class ActivityShowVent extends AppCompatActivity {
                             Log.d("ActivityShowVent", "No se actualizaron los datos en el balance");
                         }
                     } else {
-                        Log.d("ActivityShowVent", "Columnas de ventas o compra no encontradas");
+                        Log.d("ActivityShowVent", "Columnas de ventas o stock no encontradas");
                     }
                 }
             } catch (Exception ex) {
@@ -191,11 +189,11 @@ public class ActivityShowVent extends AppCompatActivity {
                 }
             }
 
-            // Eliminar producto de Firebase
+            // Eliminar venta de Firebase
             databaseFirebase.collection(userEmail)
                     .document("tableVentas")
-                    .collection(venta.getCodigo())
-                    .document(venta.getNombre())
+                    .collection(venta.getID())
+                    .document(venta.getCodigo())
                     .delete()
                     .addOnSuccessListener(aVoid -> Log.d("ActivityShowVent", "Venta eliminada correctamente de Firebase"))
                     .addOnFailureListener(e -> Log.e("ActivityShowVent", "Error al eliminar venta de Firebase", e));

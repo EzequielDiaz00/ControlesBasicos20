@@ -21,8 +21,8 @@ public class DBSqlite extends SQLiteOpenHelper {
     public static class TableBalance implements BaseColumns {
         public static final String TABLE_BALANCE = "Balance";
         public static final String COLUMN_USER = "User";
-        public static final String COLUMN_COMP = "Total_Compra";
         public static final String COLUMN_VENT = "Total_Venta";
+        public static final String COLUMN_PROD = "Total_Productos";
     }
 
     public static class TableProd implements BaseColumns {
@@ -57,21 +57,21 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_USER =
             "CREATE TABLE " + TableUser.TABLE_USER + " (" +
-                    TableUser._ID + " INTEGER PRIMARY KEY," +
+                    TableUser._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     TableUser.COLUMN_NOMBRE + " TEXT," +
                     TableUser.COLUMN_CORREO + " TEXT," +
                     TableUser.COLUMN_TYPE + " TEXT," +
                     TableUser.COLUMN_FOTO + " TEXT)";
     private static final String SQL_CREATE_TABLE_BALANCE =
             "CREATE TABLE " + TableBalance.TABLE_BALANCE + " (" +
-                    TableBalance._ID + " INTEGER PRIMARY KEY," +
+                    TableBalance._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     TableBalance.COLUMN_USER + " TEXT," +
-                    TableBalance.COLUMN_COMP + " TEXT," +
-                    TableBalance.COLUMN_VENT + " TEXT)";
+                    TableBalance.COLUMN_VENT + " TEXT," +
+                    TableBalance.COLUMN_PROD + " TEXT)";
 
     private static final String SQL_CREATE_TABLE_PROD =
             "CREATE TABLE " + TableProd.TABLE_PROD + " (" +
-                    TableProd._ID + " INTEGER PRIMARY KEY," +
+                    TableProd._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     TableProd.COLUMN_USER + " TEXT," +
                     TableProd.COLUMN_CODIGO + " TEXT," +
                     TableProd.COLUMN_NOMBRE + " TEXT," +
@@ -85,7 +85,7 @@ public class DBSqlite extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_VENT =
             "CREATE TABLE " + TableVent.TABLE_VENT + " (" +
-                    TableVent._ID + " INTEGER PRIMARY KEY," +
+                    TableVent._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                     TableVent.COLUMN_USER + " TEXT," +
                     TableVent.COLUMN_FECHA + " TEXT," +
                     TableVent.COLUMN_FOTO_PROD + " TEXT," +

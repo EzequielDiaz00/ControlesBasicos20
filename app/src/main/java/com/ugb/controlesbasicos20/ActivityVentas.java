@@ -157,6 +157,8 @@ public class ActivityVentas extends AppCompatActivity {
                     listVent.setAdapter(adapter);
                     lblVentas.setText("Ventas: " + ventas.size());
                 } else {
+                    lblGanancia.setText("Total Ganancia: $0");
+                    lblVentas.setText("Ventas: 0");
                     Toast.makeText(this, "Aún no hay Ventas", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -169,7 +171,7 @@ public class ActivityVentas extends AppCompatActivity {
         String[] projectionBalance = {
                 DBSqlite.TableBalance.COLUMN_USER,
                 DBSqlite.TableBalance.COLUMN_VENT,
-                DBSqlite.TableBalance.COLUMN_COMP
+                DBSqlite.TableBalance.COLUMN_PROD
         };
 
         String selectionBal = DBSqlite.TableBalance.COLUMN_USER + " = ?";
@@ -188,13 +190,12 @@ public class ActivityVentas extends AppCompatActivity {
                 while (cursorBal.moveToNext()) {
                     String user = cursorBal.getString(cursorBal.getColumnIndexOrThrow(DBSqlite.TableBalance.COLUMN_USER));
                     String venta = cursorBal.getString(cursorBal.getColumnIndexOrThrow(DBSqlite.TableBalance.COLUMN_VENT));
-                    String compra = cursorBal.getString(cursorBal.getColumnIndexOrThrow(DBSqlite.TableBalance.COLUMN_COMP));
 
-                    balance.add(new ClassBalance(user, compra, venta));
+                    balance.add(new ClassBalance(user, null, venta));
                 }
                 if (!balance.isEmpty()) {
-                    ClassBalance classBalance = balance.get(0);  // Suponiendo que sólo hay un balance por usuario
-                    lblGanancia.setText("Total Ganancia: " + classBalance.getVenta());
+                    ClassBalance classBalance = balance.get(0);
+                    lblGanancia.setText("Total Ganancia: $" + classBalance.getVenta());
                 } else {
                     Toast.makeText(this, "Aún no hay Ganancias", Toast.LENGTH_SHORT).show();
                 }

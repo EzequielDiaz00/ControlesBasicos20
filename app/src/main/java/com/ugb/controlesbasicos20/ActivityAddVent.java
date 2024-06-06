@@ -23,7 +23,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ActivityAddVent extends AppCompatActivity {
@@ -31,12 +33,11 @@ public class ActivityAddVent extends AppCompatActivity {
     ImageView imgFoto;
     TextView lblCodigo, lblNombre, lblMarca, lblPrecio;
     EditText txtFecha, txtCantidad, txtCliente;
-    String urlCompletaFoto, fotoURL;
+    String urlCompletaFoto, fotoURL, IDVent;
     Double gananciaVent;
     Button btnVender;
     DBSqlite dbSqlite;
-    SQLiteDatabase dbWrite;
-    SQLiteDatabase dbRead;
+    SQLiteDatabase dbWrite, dbRead;
     FirebaseFirestore databaseFirebase;
     ActivityMain activityMain;
 
@@ -132,8 +133,10 @@ public class ActivityAddVent extends AppCompatActivity {
 
             long newRowId = dbWrite.insert(DBSqlite.TableVent.TABLE_VENT, null, values);
 
+            cargarIdVenta(userEmail);
+
             if (newRowId != -1) {
-                insertDataToFirebase(userEmail, codigo, nombre, marca, String.valueOf(precio), imgProd, fotoUrl, fecha, String.valueOf(cantidad), cliente, String.valueOf(total), ganancia);
+                insertDataToFirebase(IDVent, userEmail, codigo, nombre, marca, String.valueOf(precio), imgProd, fotoUrl, fecha, String.valueOf(cantidad), cliente, String.valueOf(total), ganancia);
                 updateDataToBalance(userEmail, ganancia, 0.0);
                 startActivity(new Intent(getApplicationContext(), ActivityVentas.class));
                 finish();
@@ -145,8 +148,9 @@ public class ActivityAddVent extends AppCompatActivity {
         }
     }
 
-    private void insertDataToFirebase(String userEmail, String codigo, String nombre, String marca, String precio, String foto, String fotoUrl, String fecha, String cantidad, String cliente, String total, Double ganancia) {
+    private void insertDataToFirebase(String IDVent, String userEmail, String codigo, String nombre, String marca, String precio, String foto, String fotoUrl, String fecha, String cantidad, String cliente, String total, Double ganancia) {
         Map<String, Object> prodData = new HashMap<>();
+        prodData.put("ID", IDVent);
         prodData.put("user", userEmail);
         prodData.put("codigo", codigo);
         prodData.put("nombre", nombre);
@@ -160,7 +164,7 @@ public class ActivityAddVent extends AppCompatActivity {
         prodData.put("total", total);
         prodData.put("ganancia", ganancia);
 
-        databaseFirebase.collection(userEmail).document("tableVentas").collection(codigo).document(cliente).set(prodData, SetOptions.merge())
+        databaseFirebase.collection(userEmail).document("tableVentas").collection(IDVent).document(codigo).set(prodData, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -174,10 +178,10 @@ public class ActivityAddVent extends AppCompatActivity {
                 });
     }
 
-    private void updateDataToBalance(String userEmail, Double ventas, Double compra) {
+    private void updateDataToBalance(String userEmail, Double ventas, Double stock) {
         String[] projection = {
                 DBSqlite.TableBalance.COLUMN_USER,
-                DBSqlite.TableBalance.COLUMN_COMP,
+                DBSqlite.TableBalance.COLUMN_PROD,
                 DBSqlite.TableBalance.COLUMN_VENT
         };
 
@@ -201,7 +205,6 @@ public class ActivityAddVent extends AppCompatActivity {
                 ContentValues valuesUser = new ContentValues();
                 valuesUser.put(DBSqlite.TableBalance.COLUMN_USER, userEmail);
                 valuesUser.put(DBSqlite.TableBalance.COLUMN_VENT, ventas);
-                valuesUser.put(DBSqlite.TableBalance.COLUMN_COMP, compra);
 
                 long newRowId = dbWrite.insert(DBSqlite.TableBalance.TABLE_BALANCE, null, valuesUser);
 
@@ -215,18 +218,14 @@ public class ActivityAddVent extends AppCompatActivity {
 
             // Si el cursor no es null y tiene filas, actualiza los datos existentes
             int ventIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_VENT);
-            int compIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_COMP);
 
-            if (ventIndex != -1 && compIndex != -1) {
+            if (ventIndex != -1) {
                 Double currentVent = cursor.getDouble(ventIndex);
-                Double currentComp = cursor.getDouble(compIndex);
 
                 Double totVent = currentVent + ventas;
-                Double totComp = currentComp + compra;
 
                 ContentValues values = new ContentValues();
                 values.put(DBSqlite.TableBalance.COLUMN_VENT, totVent);
-                values.put(DBSqlite.TableBalance.COLUMN_COMP, totComp);
 
                 String updateSelection = DBSqlite.TableBalance.COLUMN_USER + " = ?";
                 String[] updateSelectionArgs = {userEmail};
@@ -243,6 +242,48 @@ public class ActivityAddVent extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.d("ActivityAddVent", "Error al actualizar Balance: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+    private void cargarIdVenta(String userEmail) {
+        List<ClassVenta> ventas = new ArrayList<>();
+
+        String[] projection = {
+                DBSqlite.TableVent._ID,
+                DBSqlite.TableVent.COLUMN_USER
+        };
+
+        String selection = DBSqlite.TableVent.COLUMN_USER + " = ?";
+        String[] selectionArgs = {userEmail};
+
+        Cursor cursor = null;
+        try {
+            cursor = dbRead.query(
+                    DBSqlite.TableVent.TABLE_VENT,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int correoIndex = cursor.getColumnIndex(DBSqlite.TableUser.COLUMN_CORREO);
+                int IdIndex = cursor.getColumnIndex(DBSqlite.TableUser._ID);
+
+                IDVent = cursor.getString(IdIndex);
+                String correo = cursor.getString(correoIndex);
+
+            } else {
+                Log.d("ActivityAddVent", "Error al extraer ID: ");
+            }
+        } catch (Exception e) {
+            Log.d("ActivityAddVent", "Error al extraer ID: " + e.getMessage());
         } finally {
             if (cursor != null) {
                 cursor.close();

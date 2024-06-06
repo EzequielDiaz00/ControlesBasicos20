@@ -4,12 +4,12 @@ import java.io.Serializable;
 
 public class ClassBalance {
     private String user;
-    private String compra;
+    private String stock;
     private String venta;
 
-    public ClassBalance(String user, String compra, String venta) {
+    public ClassBalance(String user, String stock, String venta) {
         this.user = user;
-        this.compra = compra;
+        this.stock = stock;
         this.venta = venta;
     }
 
@@ -17,8 +17,8 @@ public class ClassBalance {
         return user;
     }
 
-    public String getCompra() {
-        return compra;
+    public String getStock() {
+        return stock;
     }
 
     public String getVenta() {

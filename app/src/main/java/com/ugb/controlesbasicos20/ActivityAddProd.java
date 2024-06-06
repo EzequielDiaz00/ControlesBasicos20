@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -46,7 +47,7 @@ public class ActivityAddProd extends AppCompatActivity {
     Button btnGuardarProd;
     ActivityMain activityMain;
     DBSqlite dbSqlite;
-    SQLiteDatabase dbWrite;
+    SQLiteDatabase dbWrite, dbRead;
     FirebaseFirestore databaseFirebase;
     FirebaseStorage storageProd;
     StorageReference storageProdRef;
@@ -205,6 +206,7 @@ public class ActivityAddProd extends AppCompatActivity {
                         long newRowId = dbWrite.insert(DBSqlite.TableProd.TABLE_PROD, null, values);
 
                         insertDataToFirebase(userEmail, codigo, nombre, marca, descripcion, precio, foto);
+                        updateDataToBalance(userEmail, 0.0, Double.parseDouble(stock));
 
                     } catch (Exception ex) {
                         Log.d("ActivityAddProd", "Error al insertar los datos en SQLite: " + ex.getMessage());
@@ -231,6 +233,7 @@ public class ActivityAddProd extends AppCompatActivity {
 
         dbSqlite = new DBSqlite(this);
         dbWrite = dbSqlite.getWritableDatabase();
+        dbRead = dbSqlite.getReadableDatabase();
         databaseFirebase = FirebaseFirestore.getInstance();
 
         storageProd = FirebaseStorage.getInstance();
@@ -337,5 +340,77 @@ public class ActivityAddProd extends AppCompatActivity {
                 selection,
                 selectionArgs
         );
+    }
+
+    private void updateDataToBalance(String userEmail, Double ventas, Double stock) {
+        String[] projection = {
+                DBSqlite.TableBalance.COLUMN_USER,
+                DBSqlite.TableBalance.COLUMN_PROD,
+                DBSqlite.TableBalance.COLUMN_VENT
+        };
+
+        String selection = DBSqlite.TableBalance.COLUMN_USER + " = ?";
+        String[] selectionArgs = {userEmail};
+
+        Cursor cursor = null;
+        try {
+            cursor = dbRead.query(
+                    DBSqlite.TableBalance.TABLE_BALANCE,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    null
+            );
+
+            if (cursor == null || !cursor.moveToFirst()) {
+                // Si el cursor es null o no tiene filas, inserta un nuevo usuario
+                ContentValues valuesUser = new ContentValues();
+                valuesUser.put(DBSqlite.TableBalance.COLUMN_USER, userEmail);
+                valuesUser.put(DBSqlite.TableBalance.COLUMN_VENT, 0.0);
+                valuesUser.put(DBSqlite.TableBalance.COLUMN_PROD, stock);
+
+                long newRowId = dbWrite.insert(DBSqlite.TableBalance.TABLE_BALANCE, null, valuesUser);
+
+                if (newRowId != -1) {
+                    Log.d("ActivityAddVent", "Usuario agregado correctamente con ID: " + newRowId);
+                } else {
+                    Log.d("ActivityAddVent", "Error al agregar nuevo usuario");
+                }
+                return;
+            }
+
+            // Si el cursor no es null y tiene filas, actualiza los datos existentes
+            int stockIndex = cursor.getColumnIndex(DBSqlite.TableBalance.COLUMN_PROD);
+
+            if (stockIndex != -1) {
+                Double currentStock = cursor.getDouble(stockIndex);
+
+                Double totStock = currentStock + stock;
+
+                ContentValues values = new ContentValues();
+                values.put(DBSqlite.TableBalance.COLUMN_PROD, totStock);
+
+                String updateSelection = DBSqlite.TableBalance.COLUMN_USER + " = ?";
+                String[] updateSelectionArgs = {userEmail};
+
+                int rowsUpdated = dbWrite.update(DBSqlite.TableBalance.TABLE_BALANCE, values, updateSelection, updateSelectionArgs);
+
+                if (rowsUpdated > 0) {
+                    Log.d("ActivityAddProd", "Datos actualizados correctamente en el balance");
+                } else {
+                    Log.d("ActivityAddProd", "No se actualizaron los datos en el balance");
+                }
+            } else {
+                Log.d("ActivityAddProd", "Columnas de ventas o compra no encontradas");
+            }
+        } catch (Exception e) {
+            Log.d("ActivityAddProd", "Error al actualizar Balance: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
     }
 }
