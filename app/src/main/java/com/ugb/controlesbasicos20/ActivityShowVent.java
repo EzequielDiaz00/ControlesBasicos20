@@ -69,7 +69,7 @@ public class ActivityShowVent extends AppCompatActivity {
             lblCant.setText("Cantidad: " + venta.getCantidad().toString());
             lblClient.setText("Cliente: " + venta.getCliente());
             lblFec.setText("Fecha: " + venta.getFecha());
-            lblGpsUbi.setText("Ubicacion: " + venta.getLatitud() + " -- " + venta.getLongitud());
+            lblGpsUbi.setText("Ubicacion: " + venta.getLatitud() + " // " + venta.getLongitud());
 
             String urlCompletaFoto = venta.getFoto();
             Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);

@@ -52,14 +52,15 @@ public class ActivityAddVent extends AppCompatActivity implements ClassLocationC
 
         activityMain = new ActivityMain();
 
+        ClassGps classGps = new ClassGps(ActivityAddVent.this, ActivityAddVent.this);
+        classGps.registerLauncher();
         getLocationAndUpdateTextView();
 
         btnVender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String userEmail = activityMain.userEmailLogin;
-                // Obtener la ubicación antes de insertar los datos
-                ClassGps classGps = new ClassGps(ActivityAddVent.this, ActivityAddVent.this);
+
                 classGps.startGpsLocation();
             }
         });
@@ -111,7 +112,6 @@ public class ActivityAddVent extends AppCompatActivity implements ClassLocationC
                 ActivityAddVent.this.latitude = latitude;
                 ActivityAddVent.this.longitude = longitude;
 
-                // Actualizar el TextView lblGpsUbi con las coordenadas obtenidas
                 lblGpsUbi.setText(String.format("%s // %s", latitude, longitude));
             }
         });
@@ -120,14 +120,9 @@ public class ActivityAddVent extends AppCompatActivity implements ClassLocationC
 
     @Override
     public void onLocationResult(double latitude, double longitude) {
-        // Guardar las coordenadas en variables de instancia
         this.latitude = latitude;
         this.longitude = longitude;
 
-        Log.d("ActivityAddVent", "Datos: " + latitude + longitude);
-        lblGpsUbi.setText(String.valueOf(latitude) + " -- " + String.valueOf(longitude));
-
-        // Insertar los datos en la base de datos
         String userEmail = activityMain.userEmailLogin;
         insertDataToSqlite(userEmail);
     }
