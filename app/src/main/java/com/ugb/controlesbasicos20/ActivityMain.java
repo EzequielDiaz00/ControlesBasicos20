@@ -28,7 +28,7 @@ import com.google.firebase.storage.StorageReference;
 
 public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
-    Button btnAbrirProductos, btnAbrirVentas;
+    Button btnAbrirProductos, btnAbrirVentas, btnChatSupport;
     TextView lblNameUser, lblGanancia, lblVentas, lblProductos, lblProdStock;
     ImageView imgFotoUser;
     LinearLayout btnActUser;
@@ -80,6 +80,14 @@ public class ActivityMain extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        btnChatSupport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), ActivityChat.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void cargarGoogleSignIn() {
@@ -103,6 +111,7 @@ public class ActivityMain extends AppCompatActivity {
 
         btnAbrirProductos = findViewById(R.id.btnVistaProductos);
         btnAbrirVentas = findViewById(R.id.btnVistaFinanzas);
+        btnChatSupport = findViewById(R.id.btnChatSupport);
 
         lblNameUser = findViewById(R.id.lblNameUser);
         lblGanancia = findViewById(R.id.lblCountGanancia);
