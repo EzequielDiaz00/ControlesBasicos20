@@ -119,7 +119,9 @@ public class ActivityVentas extends AppCompatActivity {
                 DBSqlite.TableVent.COLUMN_PRECIO_UNITARIO,
                 DBSqlite.TableVent.COLUMN_CLIENTE,
                 DBSqlite.TableVent.COLUMN_TOTAL_VENTA,
-                DBSqlite.TableVent.COLUMN_GANANCIA
+                DBSqlite.TableVent.COLUMN_GANANCIA,
+                DBSqlite.TableVent.COLUMN_LATITUD,
+                DBSqlite.TableVent.COLUMN_LONGITUD
         };
 
         String selectionVent = DBSqlite.TableVent.COLUMN_USER + " = ?";
@@ -149,8 +151,10 @@ public class ActivityVentas extends AppCompatActivity {
                     String cliente = cursorVent.getString(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_CLIENTE));
                     double total = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_TOTAL_VENTA));
                     double ganancia = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_GANANCIA));
+                    double latitud = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_LATITUD));
+                    double longitud = cursorVent.getDouble(cursorVent.getColumnIndexOrThrow(DBSqlite.TableVent.COLUMN_LONGITUD));
 
-                    ventas.add(new ClassVenta(ID, user, codigo, nombre, marca, precio, foto, fotoUrl, fecha, cantidad, cliente, total, ganancia));
+                    ventas.add(new ClassVenta(ID, user, codigo, nombre, marca, precio, foto, fotoUrl, fecha, cantidad, cliente, total, ganancia, latitud, longitud));
                 }
                 if (!ventas.isEmpty()) {
                     adapter = new AdapterVentas(this, ventas);

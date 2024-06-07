@@ -14,10 +14,12 @@ public class ClassVenta implements Serializable {
     private String fecha;
     private Double cantidad;
     private String cliente;
+    private Double latitud;
+    private Double longitud;
     private Double totalVent;
     private Double ganancia;
 
-    public ClassVenta(String ID, String user, String codigo, String nombre, String marca, Double precio, String foto, String fotoUrl, String fecha, Double cantidad, String cliente, Double totalVent, Double ganancia) {
+    public ClassVenta(String ID, String user, String codigo, String nombre, String marca, Double precio, String foto, String fotoUrl, String fecha, Double cantidad, String cliente, Double totalVent, Double ganancia, double latitud, double longitud) {
         this.ID = ID;
         this.user = user;
         this.codigo = codigo;
@@ -31,6 +33,8 @@ public class ClassVenta implements Serializable {
         this.cliente = cliente;
         this.totalVent = totalVent;
         this.ganancia = ganancia;
+        this.latitud = latitud;
+        this.longitud = longitud;
     }
 
     public String getID() {
@@ -83,6 +87,14 @@ public class ClassVenta implements Serializable {
 
     public Double getGanancia() {
         return ganancia;
+    }
+
+    public Double getLatitud() {
+        return latitud;
+    }
+
+    public Double getLongitud() {
+        return longitud;
     }
 
 }

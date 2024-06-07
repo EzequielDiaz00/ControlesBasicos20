@@ -22,7 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ActivityShowVent extends AppCompatActivity {
 
-    TextView lblFec, lblClient, lblCod, lblNom, lblMar, lblPre, lblCant, lblTot, lblGan;
+    TextView lblFec, lblClient, lblCod, lblNom, lblMar, lblPre, lblCant, lblTot, lblGan, lblGpsUbi;
     Button btnEliminar;
     ImageView imgFotoVent;
     FloatingActionButton fabHome, fabInv, fabFin;
@@ -45,6 +45,7 @@ public class ActivityShowVent extends AppCompatActivity {
         lblMar = findViewById(R.id.lblMar);
         lblPre = findViewById(R.id.lblPre);
         lblTot = findViewById(R.id.lblTot);
+        lblGpsUbi = findViewById(R.id.lblGpsUbi);
         btnEliminar = findViewById(R.id.btnEliminar);
 
         fabHome = findViewById(R.id.fabHome);
@@ -68,6 +69,7 @@ public class ActivityShowVent extends AppCompatActivity {
             lblCant.setText("Cantidad: " + venta.getCantidad().toString());
             lblClient.setText("Cliente: " + venta.getCliente());
             lblFec.setText("Fecha: " + venta.getFecha());
+            lblGpsUbi.setText("Ubicacion: " + venta.getLatitud() + " -- " + venta.getLongitud());
 
             String urlCompletaFoto = venta.getFoto();
             Bitmap imagenBitmap = BitmapFactory.decodeFile(urlCompletaFoto);

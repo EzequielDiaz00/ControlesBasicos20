@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ActivityAddVent extends AppCompatActivity {
+public class ActivityAddVent extends AppCompatActivity implements ClassLocationCallback {
 
     ImageView imgFoto;
-    TextView lblCodigo, lblNombre, lblMarca, lblPrecio;
+    TextView lblCodigo, lblNombre, lblMarca, lblPrecio, lblGpsUbi;
     EditText txtFecha, txtCantidad, txtCliente;
     String urlCompletaFoto, fotoURL, IDVent;
     Double gananciaVent;
@@ -40,6 +40,7 @@ public class ActivityAddVent extends AppCompatActivity {
     SQLiteDatabase dbWrite, dbRead;
     FirebaseFirestore databaseFirebase;
     ActivityMain activityMain;
+    private double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +52,15 @@ public class ActivityAddVent extends AppCompatActivity {
 
         activityMain = new ActivityMain();
 
+        getLocationAndUpdateTextView();
+
         btnVender.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String userEmail = activityMain.userEmailLogin;
-                insertDataToSqlite(userEmail);
+                // Obtener la ubicación antes de insertar los datos
+                ClassGps classGps = new ClassGps(ActivityAddVent.this, ActivityAddVent.this);
+                classGps.startGpsLocation();
             }
         });
     }
@@ -66,6 +71,7 @@ public class ActivityAddVent extends AppCompatActivity {
         lblNombre = findViewById(R.id.lblNombre);
         lblMarca = findViewById(R.id.lblMarca);
         lblPrecio = findViewById(R.id.lblPrecio);
+        lblGpsUbi = findViewById(R.id.lblGpsUbi);
         txtFecha = findViewById(R.id.txtFec);
         txtCantidad = findViewById(R.id.txtCant);
         txtCliente = findViewById(R.id.txtClient);
@@ -96,6 +102,34 @@ public class ActivityAddVent extends AppCompatActivity {
                 gananciaVent = producto.getPrecio() - producto.getCosto();
             }
         }
+    }
+
+    private void getLocationAndUpdateTextView() {
+        ClassGps classGps = new ClassGps(ActivityAddVent.this, new ClassLocationCallback() {
+            @Override
+            public void onLocationResult(double latitude, double longitude) {
+                ActivityAddVent.this.latitude = latitude;
+                ActivityAddVent.this.longitude = longitude;
+
+                // Actualizar el TextView lblGpsUbi con las coordenadas obtenidas
+                lblGpsUbi.setText(String.format("%s // %s", latitude, longitude));
+            }
+        });
+        classGps.startGpsLocation();
+    }
+
+    @Override
+    public void onLocationResult(double latitude, double longitude) {
+        // Guardar las coordenadas en variables de instancia
+        this.latitude = latitude;
+        this.longitude = longitude;
+
+        Log.d("ActivityAddVent", "Datos: " + latitude + longitude);
+        lblGpsUbi.setText(String.valueOf(latitude) + " -- " + String.valueOf(longitude));
+
+        // Insertar los datos en la base de datos
+        String userEmail = activityMain.userEmailLogin;
+        insertDataToSqlite(userEmail);
     }
 
     private void insertDataToSqlite(String userEmail) {
@@ -130,6 +164,8 @@ public class ActivityAddVent extends AppCompatActivity {
             values.put(DBSqlite.TableVent.COLUMN_CLIENTE, cliente);
             values.put(DBSqlite.TableVent.COLUMN_TOTAL_VENTA, String.valueOf(total));
             values.put(DBSqlite.TableVent.COLUMN_GANANCIA, ganancia);
+            values.put(DBSqlite.TableVent.COLUMN_LATITUD, String.valueOf(latitude));  // Agregar latitud
+            values.put(DBSqlite.TableVent.COLUMN_LONGITUD, String.valueOf(longitude));  // Agregar longitud
 
             long newRowId = dbWrite.insert(DBSqlite.TableVent.TABLE_VENT, null, values);
 
@@ -163,12 +199,14 @@ public class ActivityAddVent extends AppCompatActivity {
         prodData.put("cliente", cliente);
         prodData.put("total", total);
         prodData.put("ganancia", ganancia);
+        prodData.put("latitud", latitude);  // Agregar latitud
+        prodData.put("longitud", longitude);  // Agregar longitud
 
         databaseFirebase.collection(userEmail).document("tableVentas").collection(IDVent).document(codigo).set(prodData, SetOptions.merge())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        //Exito//
+                        // Exito
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

@@ -10,8 +10,8 @@
         android:id="@+id/imgProdVent"
         android:layout_width="150dp"
         android:layout_height="150dp"
-        android:layout_margin="15dp"
         android:layout_centerHorizontal="true"
+        android:layout_margin="15dp"
         android:background="@drawable/ic_manage360_cam1"
         android:scaleType="centerCrop" />
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/imgProdVent"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
         android:hint="ID Producto"
         android:inputType="textMultiLine"
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/lblIdProd"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
         android:hint="Nombre Producto"
         android:inputType="textMultiLine"
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/lblNombre"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
         android:hint="Marca Producto"
         android:inputType="textMultiLine"
@@ -53,9 +53,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/lblMarca"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
         android:hint="Precio Producto"
+        android:inputType="textMultiLine"
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/lblGpsUbi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lblPrecio"
+        android:layout_marginTop="25dp"
+        android:gravity="center_horizontal"
+        android:hint="Ubicacion GPS"
         android:inputType="textMultiLine"
         android:textSize="18dp" />
 
@@ -63,7 +74,7 @@
         android:id="@+id/txtFec"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/lblPrecio"
+        android:layout_below="@+id/lblGpsUbi"
         android:layout_marginTop="30dp"
         android:hint="Fecha"
         android:inputType="number" />

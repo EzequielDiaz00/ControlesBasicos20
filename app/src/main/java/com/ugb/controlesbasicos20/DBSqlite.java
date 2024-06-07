@@ -22,7 +22,7 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String TABLE_BALANCE = "Balance";
         public static final String COLUMN_USER = "User";
         public static final String COLUMN_VENT = "Total_Venta";
-        public static final String COLUMN_PROD = "Total_Productos";
+        public static final String COLUMN_PROD = "Total_Stock";
     }
 
     public static class TableProd implements BaseColumns {
@@ -53,6 +53,8 @@ public class DBSqlite extends SQLiteOpenHelper {
         public static final String COLUMN_CLIENTE = "Cliente";
         public static final String COLUMN_TOTAL_VENTA = "Total_Venta";
         public static final String COLUMN_GANANCIA = "Ganancia";
+        public static final String COLUMN_LONGITUD = "GPS_LONGITUD";
+        public static final String COLUMN_LATITUD = "GPS_LATITUD";
     }
 
     private static final String SQL_CREATE_TABLE_USER =
@@ -97,6 +99,8 @@ public class DBSqlite extends SQLiteOpenHelper {
                     TableVent.COLUMN_PRECIO_UNITARIO + " TEXT," +
                     TableVent.COLUMN_CLIENTE + " TEXT," +
                     TableVent.COLUMN_GANANCIA + " TEXT," +
+                    TableVent.COLUMN_LONGITUD + " TEXT," +
+                    TableVent.COLUMN_LATITUD + " TEXT," +
                     TableVent.COLUMN_TOTAL_VENTA + " TEXT)";
 
     private static final String SQL_DELETE_ENTRIES_USER =
