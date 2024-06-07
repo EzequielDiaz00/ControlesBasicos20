@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -29,6 +31,7 @@ public class ActivityVentas extends AppCompatActivity {
     SQLiteDatabase dbRead;
     AdapterVentas adapter;
     List<ClassVenta> ventas;
+    List<ClassVenta> ventasFiltradas;
     List<ClassBalance> balance;
     ActivityMain activityMain;
 
@@ -74,13 +77,47 @@ public class ActivityVentas extends AppCompatActivity {
         listVent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ClassVenta ventaSeleccionada = ventas.get(position);
+                ClassVenta ventaSeleccionada = ventasFiltradas.get(position);
 
                 Intent intent = new Intent(getApplicationContext(), ActivityShowVent.class);
                 intent.putExtra("venta", ventaSeleccionada);
                 startActivity(intent);
             }
         });
+
+        txtBuscarVent.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No se necesita implementar
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filtrarVentas(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // No se necesita implementar
+            }
+        });
+    }
+
+    private void filtrarVentas(String query) {
+        ventasFiltradas.clear();
+        if (query.isEmpty()) {
+            ventasFiltradas.addAll(ventas);
+        } else {
+            for (ClassVenta venta : ventas) {
+                if (venta.getNombre().toLowerCase().contains(query.toLowerCase()) ||
+                        venta.getMarca().toLowerCase().contains(query.toLowerCase()) ||
+                        venta.getCodigo().toLowerCase().contains(query.toLowerCase()) ||
+                        venta.getCliente().toLowerCase().contains(query.toLowerCase())) {
+                    ventasFiltradas.add(venta);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 
     private void cargarObjetos() {
@@ -100,6 +137,7 @@ public class ActivityVentas extends AppCompatActivity {
 
     private void loadDataFromSqlite(String userEmail) {
         ventas = new ArrayList<>();
+        ventasFiltradas = new ArrayList<>();
         balance = new ArrayList<>();
         loadDataBalanceSqlite(userEmail);
         loadDataVentasSqlite(userEmail);
@@ -157,7 +195,8 @@ public class ActivityVentas extends AppCompatActivity {
                     ventas.add(new ClassVenta(ID, user, codigo, nombre, marca, precio, foto, fotoUrl, fecha, cantidad, cliente, total, ganancia, latitud, longitud));
                 }
                 if (!ventas.isEmpty()) {
-                    adapter = new AdapterVentas(this, ventas);
+                    ventasFiltradas.addAll(ventas);
+                    adapter = new AdapterVentas(this, ventasFiltradas);
                     listVent.setAdapter(adapter);
                     lblVentas.setText("Ventas: " + ventas.size());
                 } else {

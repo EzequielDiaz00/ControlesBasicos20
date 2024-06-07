@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -28,7 +30,8 @@ public class ActivityProductos extends AppCompatActivity {
     DBSqlite dbSqlite;
     SQLiteDatabase dbRead;
     AdapterProductos adapter;
-    List<ClassProductos> productos;  // Mueve la declaración aquí
+    List<ClassProductos> productos;
+    List<ClassProductos> productosFiltrados;
     ActivityMain activityMain;
 
     @Override
@@ -81,13 +84,46 @@ public class ActivityProductos extends AppCompatActivity {
         listProd.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ClassProductos productoSeleccionado = productos.get(position);
+                ClassProductos productoSeleccionado = productosFiltrados.get(position);
 
                 Intent intent = new Intent(getApplicationContext(), ActivityShowProd.class);
                 intent.putExtra("producto", productoSeleccionado);
                 startActivity(intent);
             }
         });
+
+        txtBuscarProd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No se necesita implementar
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filtrarProductos(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // No se necesita implementar
+            }
+        });
+    }
+
+    private void filtrarProductos(String query) {
+        productosFiltrados.clear();
+        if (query.isEmpty()) {
+            productosFiltrados.addAll(productos);
+        } else {
+            for (ClassProductos producto : productos) {
+                if (producto.getNombre().toLowerCase().contains(query.toLowerCase()) ||
+                        producto.getMarca().toLowerCase().contains(query.toLowerCase()) ||
+                        producto.getCodigo().toLowerCase().contains(query.toLowerCase())) {
+                    productosFiltrados.add(producto);
+                }
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 
     private void cargarObjetos() {
@@ -169,7 +205,8 @@ public class ActivityProductos extends AppCompatActivity {
             if (productos.isEmpty()) {
                 Toast.makeText(this, "Aún no hay productos. ¡Agrega uno!", Toast.LENGTH_SHORT).show();
             } else {
-                adapter = new AdapterProductos(this, productos);
+                productosFiltrados = new ArrayList<>(productos); // Inicializa la lista de filtrados
+                adapter = new AdapterProductos(this, productosFiltrados);
                 listProd.setAdapter(adapter);
             }
         } catch (Exception e) {
@@ -181,4 +218,3 @@ public class ActivityProductos extends AppCompatActivity {
         }
     }
 }
-

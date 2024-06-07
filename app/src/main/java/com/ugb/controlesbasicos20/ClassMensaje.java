@@ -1,10 +1,10 @@
 package com.ugb.controlesbasicos20;
 
-public class Mensaje {
+public class ClassMensaje {
     private String contenido;
     private String emisor;
 
-    public Mensaje(String contenido, String emisor) {
+    public ClassMensaje(String contenido, String emisor) {
         this.contenido = contenido;
         this.emisor = emisor;
     }

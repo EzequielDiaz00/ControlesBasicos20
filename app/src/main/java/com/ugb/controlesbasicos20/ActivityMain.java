@@ -29,7 +29,7 @@ import com.google.firebase.storage.StorageReference;
 public class ActivityMain extends AppCompatActivity {
     TabHost tbhMain;
     Button btnAbrirProductos, btnAbrirVentas, btnChatSupport;
-    TextView lblNameUser, lblGanancia, lblVentas, lblProductos, lblProdStock;
+    TextView lblNameUser, lblGanancia, lblVentas, lblProductos, lblProdStock, lblGananciaM, lblVentasM, lblProductosM, lblProdStockM;
     ImageView imgFotoUser;
     LinearLayout btnActUser;
     ClassVerifyNet classVerifyNet;
@@ -114,10 +114,17 @@ public class ActivityMain extends AppCompatActivity {
         btnChatSupport = findViewById(R.id.btnChatSupport);
 
         lblNameUser = findViewById(R.id.lblNameUser);
+
         lblGanancia = findViewById(R.id.lblCountGanancia);
         lblVentas = findViewById(R.id.lblCountVent);
         lblProductos = findViewById(R.id.lblCountProd);
         lblProdStock = findViewById(R.id.lblCountStock);
+
+        lblGananciaM = findViewById(R.id.lblCountGananciaM);
+        lblVentasM = findViewById(R.id.lblCountVentM);
+        lblProductosM = findViewById(R.id.lblCountProdM);
+        lblProdStockM = findViewById(R.id.lblCountStockM);
+
         imgFotoUser = findViewById(R.id.imgFotoUser);
         btnActUser = findViewById(R.id.btnActUser);
 
@@ -201,9 +208,11 @@ public class ActivityMain extends AppCompatActivity {
     private void loadDataBalanceSqlite(String userEmail) {
         int countVent = dbSqlite.getCountVent();
         lblVentas.setText("Ventas hechas: " + countVent);
+        lblVentasM.setText("Ventas hechas: " + countVent);
 
         int countProd = dbSqlite.getCountProd();
         lblProductos.setText("Productos: " + countProd);
+        lblProductosM.setText("Productos: " + countProd);
 
         classGanancia = new ClassLoadBalance(ActivityMain.this);
 
@@ -214,10 +223,12 @@ public class ActivityMain extends AppCompatActivity {
             lblGanancia.setText("Ganancia Total: $0.0");
         }
         lblGanancia.setText("Ganancia Total: $" + classGanancia.userGanancia);
+        lblGananciaM.setText("Ganancia Total: $" + classGanancia.userGanancia);
 
         if (classGanancia.userStock == null) {
             lblProdStock.setText("Productos en Stock: 0");
         }
         lblProdStock.setText("Productos en Stock: " + classGanancia.userStock);
+        lblProdStockM.setText("Productos en Stock: " + classGanancia.userStock);
     }
 }
