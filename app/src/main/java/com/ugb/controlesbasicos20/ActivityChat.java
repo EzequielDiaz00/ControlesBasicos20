@@ -70,7 +70,7 @@ public class ActivityChat extends AppCompatActivity {
 
             HashMap<String, Object> mensajeMap = new HashMap<>();
             mensajeMap.put(KEY_CONTENT, mensaje);
-            mensajeMap.put(KEY_SENDER, userID);
+            mensajeMap.put(KEY_SENDER, otherUserID);
             mensajeMap.put(KEY_TIMESTAMP, timestamp);
 
             databaseRef.child(messageId).setValue(mensajeMap);

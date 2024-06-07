@@ -37,15 +37,15 @@ public class AdapterChat extends RecyclerView.Adapter<AdapterChat.MensajeViewHol
 
         if (mensaje.getEmisor() != null && mensaje.getEmisor().equals(userID)) {
             // Si el mensaje es del usuario actual, establecer la gravedad a la derecha
-            holder.layout1.setGravity(Gravity.RIGHT);
-            holder.layout2.setVisibility(View.GONE); // Ocultar el contenedor del mensaje del receptor
-            holder.textViewMensajeEmisor.setText(mensaje.getContenido());
-        } else if (mensaje.getEmisor() != null && mensaje.getEmisor().equals(otherUserID)) {
-            // Si el mensaje es del otro usuario, establecer la gravedad a la izquierda
             holder.layout1.setGravity(Gravity.LEFT);
             holder.layout2.setVisibility(View.VISIBLE); // Mostrar el contenedor del mensaje del receptor
             holder.layout1.setVisibility(View.GONE);
             holder.textViewMensajeReceptor.setText(mensaje.getContenido());
+        } else if (mensaje.getEmisor() != null && mensaje.getEmisor().equals(otherUserID)) {
+            // Si el mensaje es del otro usuario, establecer la gravedad a la izquierda
+            holder.layout1.setGravity(Gravity.RIGHT);
+            holder.layout2.setVisibility(View.GONE); // Ocultar el contenedor del mensaje del receptor
+            holder.textViewMensajeEmisor.setText(mensaje.getContenido());
         }
     }
 
