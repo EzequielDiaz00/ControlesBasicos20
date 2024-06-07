@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,30 +17,32 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class ActivityChat extends AppCompatActivity {
+
+    private static final String KEY_CONTENT = "contenido";
+    private static final String KEY_SENDER = "emisor";
+    private static final String KEY_TIMESTAMP = "timestamp";
+    private static final String CHATS_REF = "chats";
 
     private RecyclerView recyclerViewMensajes;
     private EditText editTextMensaje;
     private Button btnEnviar;
     private DatabaseReference databaseRef;
-    private String userID;
+    private String userID = "user";
+    private String otherUserID = "soporte";
     private AdapterChat adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-        // Inicializar la instancia de AdapterChat
-        adapter = new AdapterChat(new ArrayList<>());
-
-        // Obtener el ID del usuario de la actividad anterior
-        userID = getIntent().getStringExtra("userID");
 
         recyclerViewMensajes = findViewById(R.id.recyclerViewMensajes);
         editTextMensaje = findViewById(R.id.editTextMensaje);
@@ -48,39 +51,30 @@ public class ActivityChat extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerViewMensajes.setLayoutManager(layoutManager);
 
-        // Asignar el adaptador al RecyclerView
+        adapter = new AdapterChat(new ArrayList<>(), userID, otherUserID);
         recyclerViewMensajes.setAdapter(adapter);
 
-        // Obtener una referencia a la base de datos de Firebase
-        databaseRef = FirebaseDatabase.getInstance().getReference("chats");
+        databaseRef = FirebaseDatabase.getInstance().getReference(CHATS_REF);
 
-        btnEnviar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendMessages();
-            }
-        });
+        btnEnviar.setOnClickListener(v -> sendMessage());
 
-        // Cargar los mensajes existentes
         loadMessages();
     }
 
-    private void sendMessages() {
+    private void sendMessage() {
         String mensaje = editTextMensaje.getText().toString();
 
         if (!mensaje.isEmpty()) {
-            // Generar una clave única para el mensaje
             String messageId = databaseRef.push().getKey();
+            String timestamp = String.valueOf(System.currentTimeMillis());
 
-            // Crear un objeto HashMap para representar el mensaje
             HashMap<String, Object> mensajeMap = new HashMap<>();
-            mensajeMap.put("contenido", mensaje);
-            mensajeMap.put("emisor", userID); // ID del usuario que envía el mensaje
+            mensajeMap.put(KEY_CONTENT, mensaje);
+            mensajeMap.put(KEY_SENDER, userID);
+            mensajeMap.put(KEY_TIMESTAMP, timestamp);
 
-            // Guardar el mensaje en la base de datos con la clave generada
             databaseRef.child(messageId).setValue(mensajeMap);
 
-            // Limpiar el campo de texto después de enviar el mensaje
             editTextMensaje.setText("");
         } else {
             Toast.makeText(this, "Por favor, escribe un mensaje", Toast.LENGTH_SHORT).show();
@@ -88,25 +82,23 @@ public class ActivityChat extends AppCompatActivity {
     }
 
     private void loadMessages() {
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        Query query = databaseRef.orderByChild(KEY_TIMESTAMP);
+
+        query.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Limpiar los mensajes actuales antes de cargar nuevos mensajes
                 adapter.clearMessages();
 
-                // Iterar sobre los mensajes en la base de datos
                 for (DataSnapshot mensajeSnapshot : dataSnapshot.getChildren()) {
-                    String contenido = mensajeSnapshot.child("contenido").getValue(String.class);
-                    String emisor = mensajeSnapshot.child("emisor").getValue(String.class);
+                    String contenido = mensajeSnapshot.child(KEY_CONTENT).getValue(String.class);
+                    String emisor = mensajeSnapshot.child(KEY_SENDER).getValue(String.class);
 
-                    // Agregar el mensaje al adaptador para que se muestre en el RecyclerView
                     adapter.addMessage(contenido, emisor);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Manejar errores de lectura de la base de datos
                 Log.e("ActivityChat", "Error al leer mensajes de la base de datos", databaseError.toException());
             }
         });
